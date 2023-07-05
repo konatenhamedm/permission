@@ -1,0 +1,46 @@
+
+{% macro colonne(colonne) %}
+    <div class="row-colonne  my-3 py-2" style="border-bottom:3px solid #000">
+        {#{{ dump(redaction.children.path.vars.data) }}#}
+        <div class="row">
+            <div class="form-group col-md-6">{{ form_row(colonne.element,{'attr':{'class':'form-control element'}}) }}</div>
+            <div class="form-group col-md-6">{{ form_row(colonne.nomEnfant,{'attr':{'class':'form-control enfant','placeholder':"Precisez le nom de l'enfant",}}) }}</div>
+        </div>
+        <div class="row ">
+            <div class="form-group col-md-12">{{ form_row(colonne.precisez,{'attr':{'class':'form-control precisez','placeholder':"Donnez un justification",}}) }}</div>
+        </div>
+         <div class="row ">
+            <div class="form-group col-md-10">{{ form_row(colonne.fichier) }}</div>
+            <div class="form-group col-md-2"> 
+                {% if colonne.vars.value and colonne.vars.value.fichier is not null %}
+            <div class="form-group col-md-1 ">
+                <a class="btn btn-dark btn-xs" target="_blank" title="Télécharger le document" href="{{ path('fichier_index', {id:  colonne.vars.value.fichier.id}) }}" download> <i class="fe fe-upload"></i>
+                    <i class="fa fa-download"></i></a>
+                {#  <button type="button" class="btn btn-dark">Upload</button>#}
+            </div>
+            {# {% else %}
+                 <div class="form-group col-md-1 ">
+                     <a class="btn btn-secondary btn-xs" target="_blank" title="Télécharger le document" href="#" download> <i class="fe fe-upload"></i>
+                         <i class="fa fa-upload"></i></a>
+                     #}{#  <button type="button" class="btn btn-dark">Upload</button>#}{#
+                 </div>#}
+        {% endif %}
+                            
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-1 del-col" data-parent=".row-colonne"></div>
+        </div>
+    </div>
+
+{% endmacro  %}
+
+
+{% macro prototype_ligne_colonne(form) %}
+    <div class="list-colonne"  data-prototype="{{ _self.colonne(form.motifs.vars.prototype)|e }}"></div>
+    <div class="column-container proto-container" data-childclass="">
+        {% for item in form.motifs %}
+            {{ _self.colonne(item|e) }}
+        {% endfor %}
+    </div>
+{% endmacro %}

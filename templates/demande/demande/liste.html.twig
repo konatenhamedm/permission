@@ -1,0 +1,35 @@
+{% block body %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="checkbox-list"></div>
+            <div id="grid_app_demande_demande_ls_{{ etat }}" class="grid-dt-wrapper">Chargement....</div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block java %}
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+    <script>
+        $(function() {
+            const etat = "{{ etat }}";
+
+            $('#grid_app_demande_demande_ls_' + etat).initDataTables({{ datatable_settings(datatable) }}, {
+                searching: true,
+                ajaxUrl: "{{ path('app_demande_demande_ls', {etat: etat}) }}",
+                language: {
+                    url: asset_base_path + "/js/i18n/French.json"
+                },
+                headerCallback: function( tHead, aData, iStart, iEnd, aiDisplay ) {
+                    /*$(tHead).find('th:eq(0)').html(`<div class="form-check form-check-custom form-check-solid form-check-sm">
+                        <input class="form-check-input select-all" type="checkbox" value="-1"  data-id="-1" />
+                    </div>`);*/
+                },
+                drawCallback: function (row, data) {
+                }
+
+            });
+        });
+    </script>
+{% endblock %}

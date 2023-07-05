@@ -1,0 +1,221 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\DemandeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+#[ORM\Entity(repositoryClass: DemandeRepository::class)]
+class Demande
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message:"Le champs date debut est requis")]
+
+    #[Assert\NotNull(message:"Le champs date fin est requis")]
+    private ?\DateTimeInterface $dateDebut = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message:"Le champs date fin est requis")]
+
+    #[Assert\Expression("this.getDateDebut() < this.getDateFin()",message:"La date fin ne doit pas être antérieure ou egale  à la date début")]
+    private ?\DateTimeInterface $dateFin = null;
+
+    #[ORM\ManyToOne(inversedBy: 'demandes')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Gedmo\Blameable(on:'create')]
+    private ?Utilisateur $utilisateur = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateCreation = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $etat = null;
+
+    #[ORM\OneToMany(mappedBy: 'demande', targetEntity: Motif::class,orphanRemoval: true, cascade:['persist'])]
+    private Collection $motifs;
+
+    #[ORM\Column(length: 255)]
+    private ?string $nbreJour = null;
+
+    #[ORM\ManyToOne(inversedBy: 'demandesAvis')]
+    private ?Avis $avis = null;
+
+    #[ORM\ManyToOne(inversedBy: 'demandesAvisPresident')]
+    private ?AvisPresident $avisPresident = null;
+
+    #[ORM\Column(length: 255,nullable:true)]
+    private ?string $justificationDirecteur = null;
+
+    #[ORM\Column(length: 255,nullable:true)]
+    private ?string $justificationPresident = null;
+
+    public function __construct()
+    {
+              $this->motifs = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(\DateTimeInterface $dateDebut): self
+    {
+        $this->dateDebut = $dateDebut;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(\DateTimeInterface $dateFin): self
+    {
+        $this->dateFin = $dateFin;
+
+        return $this;
+    }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
+
+    public function getDateCreation(): ?\DateTimeInterface
+    {
+        return $this->dateCreation;
+    }
+
+    public function setDateCreation(\DateTimeInterface $dateCreation): self
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(string $etat): self
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Motif>
+     */
+    public function getMotifs(): Collection
+    {
+        return $this->motifs;
+    }
+
+    public function addMotif(Motif $motif): self
+    {
+        if (!$this->motifs->contains($motif)) {
+            $this->motifs->add($motif);
+            $motif->setDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMotif(Motif $motif): self
+    {
+        if ($this->motifs->removeElement($motif)) {
+            // set the owning side to null (unless already changed)
+            if ($motif->getDemande() === $this) {
+                $motif->setDemande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getNbreJour(): ?string
+    {
+        return $this->nbreJour;
+    }
+
+    public function setNbreJour(string $nbreJour): self
+    {
+        $this->nbreJour = $nbreJour;
+
+        return $this;
+    }
+
+    public function getAvis(): ?Avis
+    {
+        return $this->avis;
+    }
+
+    public function setAvis(?Avis $avis): static
+    {
+        $this->avis = $avis;
+
+        return $this;
+    }
+
+    public function getAvisPresident(): ?AvisPresident
+    {
+        return $this->avisPresident;
+    }
+
+    public function setAvisPresident(?AvisPresident $avisPresident): static
+    {
+        $this->avisPresident = $avisPresident;
+
+        return $this;
+    }
+
+    public function getJustificationDirecteur(): ?string
+    {
+        return $this->justificationDirecteur;
+    }
+
+    public function setJustificationDirecteur(string $justificationDirecteur): static
+    {
+        $this->justificationDirecteur = $justificationDirecteur;
+
+        return $this;
+    }
+
+    public function getJustificationPresident(): ?string
+    {
+        return $this->justificationPresident;
+    }
+
+    public function setJustificationPresident(string $justificationPresident): static
+    {
+        $this->justificationPresident = $justificationPresident;
+
+        return $this;
+    }
+}

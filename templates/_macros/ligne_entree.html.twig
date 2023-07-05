@@ -1,0 +1,47 @@
+{% macro list_ligne_motif(ligne) %}
+    <div class="row-line">
+        {#{{ dump(ligne.children.fichier.vars.data[0][0]) }}#}
+        <div class="card border-success mb-3" >
+            <div class="card-body bg-warning text-success">
+                <div class="row">
+                    <div class="form-group col-md-6">{{ form_row(ligne.element,{'attr':{'class':'form-control element'}}) }}</div>
+                    <div class="form-group col-md-6">{{ form_row(ligne.nomEnfant,{'attr':{'class':'form-control enfant','placeholder':"Precisez le nom de l'enfant",}}) }}</div>
+                </div>
+                <div class="row ">
+                    <div class="form-group col-md-12">{{ form_row(ligne.precisez,{'attr':{'class':'form-control precisez','placeholder':"Donnez un justification",}}) }}</div>
+                </div>
+
+            </div>
+            {#<div class="card-footer bg-transparent border-success" style="height: 45px;">
+                <div class="row">
+                    <div class="form-group col-md-11"></div>
+                    <div class="form-group col-md-1 del-col offset-12">
+
+                    </div>
+                </div></div>#}
+            {#<div class="card-footer bg-transparent border-success">Footer</div>#}
+        </div>
+        {#  <div class="form-group col-md-3">{{ form_row(ligne.nomEnfant,{'attr':{'class':'enfant'}}) }}</div>
+          <div class="form-group col-md-2">{{ form_row(ligne.fichier,{'attr':{'class':'enfant'}}) }}</div>
+
+      <div class="form-group col-md-3">{{ form_row(ligne.precisez,{'attr':{'class':'precisez'}}) }}</div>
+      <div class="form-group col-md-1 del-col">
+
+      </div>#}
+    </div>
+    <div class="row">
+
+    </div>
+
+{% endmacro %}
+
+{% macro list_ligne_motifs(ligne) %}
+    <div class="row-line">
+        <div class="row">
+            {# <div class="form-group col-md-6">{{ form_row(ligne.element) }}</div>#}
+            <div class="form-group col-md-12">{{ form_row(ligne.fichier) }}</div>
+        </div>
+    </div>
+
+
+{% endmacro %}
