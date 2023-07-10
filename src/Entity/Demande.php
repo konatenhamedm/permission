@@ -18,15 +18,11 @@ class Demande
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:false)]
     #[Assert\NotNull(message:"Le champs date debut est requis")]
-
-    #[Assert\NotNull(message:"Le champs date fin est requis")]
     private ?\DateTimeInterface $dateDebut = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotNull(message:"Le champs date fin est requis")]
-
+    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:true)]
     #[Assert\Expression("this.getDateDebut() < this.getDateFin()",message:"La date fin ne doit pas être antérieure ou egale  à la date début")]
     private ?\DateTimeInterface $dateFin = null;
 
@@ -44,7 +40,7 @@ class Demande
     #[ORM\OneToMany(mappedBy: 'demande', targetEntity: Motif::class,orphanRemoval: true, cascade:['persist'])]
     private Collection $motifs;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255,nullable:true)]
     private ?string $nbreJour = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandesAvis')]
@@ -58,6 +54,16 @@ class Demande
 
     #[ORM\Column(length: 255,nullable:true)]
     private ?string $justificationPresident = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotNull(message:"Veillez selectionner un type")]
+    private ?string $type = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE,nullable:true)]
+    private ?\DateTimeInterface $heureDebut = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE,nullable:true)]
+    private ?\DateTimeInterface $heureFin = null;
 
     public function __construct()
     {
@@ -215,6 +221,42 @@ class Demande
     public function setJustificationPresident(string $justificationPresident): static
     {
         $this->justificationPresident = $justificationPresident;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getHeureDebut(): ?\DateTimeInterface
+    {
+        return $this->heureDebut;
+    }
+
+    public function setHeureDebut($heureDebut): static
+    {
+        $this->heureDebut = $heureDebut;
+
+        return $this;
+    }
+
+    public function getHeureFin(): ?\DateTimeInterface
+    {
+        return $this->heureFin;
+    }
+
+    public function setHeureFin($heureFin): static
+    {
+        $this->heureFin = $heureFin;
 
         return $this;
     }

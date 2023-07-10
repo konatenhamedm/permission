@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[UniqueEntity(['username'], message: 'Ce pseudo est déjà utilisé')]
 #[ORM\Table(name:'user_utilisateur')]
-class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface,TwoFactorInterface
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,8 +27,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
     #[Assert\NotBlank(message: 'Veuillez renseigner un pseudo')]
     private ?string $username = null;
 
-    #[ORM\Column(length: 180,nullable:true)]
-    private ?string $authCode = null;
 
 
     #[ORM\Column]
@@ -369,35 +367,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
         $this->groupe = $groupe;
 
         return $this;
-    }
-
-
-    public function isEmailAuthEnabled(): bool
-    {
-        // TODO: Implement isEmailAuthEnabled() method.
-        return true;
-    }
-
-    public function getEmailAuthRecipient(): string
-    {
-        // TODO: Implement getEmailAuthRecipient() method.
-        return $this->getEmploye()->getAdresseMail();
-    }
-
-    public function getEmailAuthCode(): ?string
-    {
-        // TODO: Implement getEmailAuthCode() method.
-        if(null === $this->authCode){
-            throw new \LogicException('le email na pas ete setter');
-        }
-        return $this->authCode;
-    }
-
-    public function setEmailAuthCode(string $authCode): void
-    {
-        // TODO: Implement setEmailAuthCode() method.
-        $this->authCode = $authCode;
-
     }
 
 

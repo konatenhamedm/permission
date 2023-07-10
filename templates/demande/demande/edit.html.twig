@@ -2,7 +2,7 @@
     {% form_theme form 'widget/fields-block.html.twig' %}
     {% from '_macros/demande.html.twig' import prototype_ligne_colonne %}
     <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modification Demande</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Modification Demande | <span style="font-size:16px" >{{ demande.utilisateur.employe.nomComplet}}</span></h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,22 +18,38 @@
       {#  <div id="list-ligne" data-prototype="{{ list_ligne_motif(form.motifs.vars.prototype, 1)|e }}"></div>#}
         {{ include('_includes/ajax/response.html.twig') }}
 
-
-        <div class="row">
-            <div class="form-group col-md-5">
-                <label class="sr-onl" for="userinput1">Datedd debut*</label>
+         <div class="row">
+            <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Type*</label>
+                {{ form_widget(form.type,{attr:{'readonly':'readonly'}}) }}</div>
+                  <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Date debut*</label>
                 {{ form_widget(form.dateDebut) }}</div>
-            <div class="form-group col-md-5">
+        </div>
+        <div class="row journee">
+          
+            <div class="form-group col-md-8">
                 <label class="sr-onl" for="userinput1">Date fin*</label>
                 {{ form_widget(form.dateFin) }}</div>
 
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-4">
                 <label class="sr-onl" for="userinput1">Nombre de jour(inclus)*</label>
                 {{ form_widget(form.nbreJour,{attr:{'readonly':'readonly'}}) }}
-            </div>
+               </div>
 
         </div>
-        <br>
+        <div class="row demi">
+            <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Heure debut*</label>
+                {{ form_widget(form.heureDebut) }}</div>
+            <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Heure Fin*</label>
+                {{ form_widget(form.heureFin) }}</div>
+
+
+        </div>
+         <div style="border-bottom:3px solid #000"><br>
+        </div>
         {{ prototype_ligne_colonne(form) }}
 
 
@@ -53,9 +69,10 @@
 
 {% block java %}
     <script>
+ 
 
-
-        if($('.element').find('option:selected').attr('data-value') == "MOT1"){
+        $(function () {
+if($('.element').find('option:selected').attr('data-value') == "MOT1"){
             $(".enfant").show()
         }else{
             $(".enfant").hide()
@@ -65,6 +82,30 @@
         }else{
             $(".precisez").hide()
         }
+     if($('.type').find('option:selected').attr('value') == "TYPE_JOURNEE"){
+             $('.demi').hide();
+                    $('.journee').show();
+        }else{
+              $('.demi').show();
+                    $('.journee').hide();
+        }
+        
+    const $type = $('#{{ form.type.vars.id }}');
+   
+
+            $type.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                //alert(current_value);
+                //$error.html('');
+               if (current_value == "TYPE_JOURNEE" ) {
+                    $('.demi').hide();
+                    $('.journee').show();
+                } else {
+                     $('.demi').show();
+                    $('.journee').hide();
+                }
+            });
 
         $('.dateDebut,.dateFin').on('change',function (e)  {
             var date1 = new Date($(".dateDebut").val());
@@ -92,9 +133,6 @@
                 $(this).val(picker.startDate.format('DD/MM/YYYY'));
             });
         });
-
-        $(function () {
-
             const $container = $('.row-colonne');
 
             var index = $container.length;

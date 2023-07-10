@@ -18,19 +18,36 @@
       {#  <div id="list-ligne" data-prototype="{{ list_ligne_motif(form.motifs.vars.prototype, 1)|e }}"></div>#}
         {{ include('_includes/ajax/response.html.twig') }}
         <div class="row">
-            <div class="form-group col-md-5">
+            <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Type*</label>
+                {{ form_widget(form.type) }}</div>
+                  <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Date debut*</label>
                 {{ form_widget(form.dateDebut) }}</div>
-            <div class="form-group col-md-5">
+        </div>
+        <div class="row journee">
+          
+            <div class="form-group col-md-8">
                 <label class="sr-onl" for="userinput1">Date fin*</label>
                 {{ form_widget(form.dateFin) }}</div>
 
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-4">
                 <label class="sr-onl" for="userinput1">Nombre de jour(inclus)*</label>
                 {{ form_widget(form.nbreJour,{attr:{'readonly':'readonly'}}) }}
                </div>
 
         </div>
+        <div class="row demi">
+            <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Heure debut*</label>
+                {{ form_widget(form.heureDebut) }}</div>
+            <div class="form-group col-md-6">
+                <label class="sr-onl" for="userinput1">Heure Fin*</label>
+                {{ form_widget(form.heureFin) }}</div>
+
+
+        </div>
+
         <br>
         {{ prototype_ligne_colonne(form) }}
 
@@ -50,7 +67,53 @@
 
 {% block java %}
     <script>
+    $('.journee').hide();
+    $('.demi').hide();
+     if($('.element').find('option:selected').attr('data-value') == "MOT1"){
+            $(".enfant").show()
+        }else{
+            $(".enfant").hide()
+        }
+        if($('.element').find('option:selected').attr('data-value') == "MOT3"){
+            $(".precisez").show()
+        }else{
+            $(".precisez").hide()
+        }
 
+              $('.element').on('change',function (e) {
+
+
+                    $res = $(this).closest('.row-colonne');
+                    $resultat= $(this);
+
+                    if($resultat.find('option:selected').attr('data-value') == "MOT1"){
+                        $res.find(".enfant").show()
+                    }else{
+                        $res.find(".enfant").hide()
+                    }
+                    if($resultat.find('option:selected').attr('data-value') == "MOT3"){
+                        $res.find(".precisez").show()
+                    }else{
+                        $res.find(".precisez").hide()
+                    }
+
+
+                });
+    const $type = $('#{{ form.type.vars.id }}');
+          
+            $type.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                //alert(current_value);
+                //$error.html('');
+               if (current_value == "TYPE_JOURNEE" ) {
+                    $('.demi').hide();
+                    $('.journee').show();
+                } else {
+                     $('.demi').show();
+                    $('.journee').hide();
+                }
+            });
 
         $('.dateDebut,.dateFin').on('change',function (e)  {
             var date1 = new Date($(".dateDebut").val());

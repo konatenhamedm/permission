@@ -8,6 +8,7 @@ use App\Entity\Demande;
 use App\Entity\Entreprise;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Security\Core\Security;
 
 class DemandeType extends AbstractType
@@ -30,6 +32,17 @@ class DemandeType extends AbstractType
     {
 
         $builder
+            ->add('type', ChoiceType::class,
+            [   'placeholder'=>'Choissez un type de mande',
+                'required'     => false,
+                'expanded'     => false,
+                'attr' => ['class' => 'has-select2 type'],
+                'multiple' => false,
+                'choices'  => array_flip([
+                    'TYPE_JOURNEE' => 'Toute la journée',
+                    'TYPE_DEMI_JOURNEE' => 'Demi journée'
+                ]),
+            ])
             ->add('dateDebut', DateType::class, [
                 "required" => false,
                 "widget" => 'single_text',
@@ -49,6 +62,14 @@ class DemandeType extends AbstractType
             ->add('nbreJour',TextType::class,[
                 'label'=>'Nombre de jour(inclus)',
                 'attr' => ['class' => 'nbre']
+            ])
+            ->add('heureDebut',TimeType::class,[
+                'input'  => 'datetime',
+                'widget' => 'single_text',
+            ])
+            ->add('heureFin',TimeType::class,[
+                'input'  => 'datetime',
+                'widget' => 'single_text',
             ])
             ->add('motifs', CollectionType::class, [
                 'entry_type' => MotifType::class,

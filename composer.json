@@ -13,6 +13,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.12",
         "friendsofsymfony/jsrouting-bundle": "^3.2",
+        "graphp/graphviz": "^0.2.2",
         "knplabs/knp-menu-bundle": "^3.2",
         "lexik/jwt-authentication-bundle": "^2.14",
         "mpdf/mpdf": "^8.1",

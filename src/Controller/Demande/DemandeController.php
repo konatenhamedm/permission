@@ -4,10 +4,13 @@ namespace App\Controller\Demande;
 
 use App\Controller\FileTrait;
 use App\Entity\Demande;
+use App\Entity\Motif;
 use App\Entity\Utilisateur;
 use App\Form\DemandeType;
 use App\Form\DemandeWorkflowType;
+use App\Repository\AvisRepository;
 use App\Repository\DemandeRepository;
+use App\Repository\ElementMotifRepository;
 use App\Repository\FichierRepository;
 use App\Repository\MotifRepository;
 use App\Service\ActionRender;
@@ -123,14 +126,16 @@ class DemandeController extends AbstractController
             ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut','format' => 'd-m-Y',"searchable"=>true,'globalSearchable'=>true])
             ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin','format' => 'd-m-Y'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
+            ->add('entreprise', TextColumn::class, ['label' => 'Entreprise', 'field' => 'en.denomination'])
             ->add('prenom', TextColumn::class, ['label' => 'Prenoms', 'field' => 'e.prenom'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Demande::class,
                 'query' => function(QueryBuilder $qb)  use ($etat) {
-                    $qb->select('d,u, e, f')
+                    $qb->select('d,u, e, f, en')
                         ->from(Demande::class, 'd')
                         ->join('d.utilisateur', 'u')
                         ->join('u.employe', 'e')
+                        ->join('e.entreprise', 'en')
                         ->orderBy('d.dateCreation','ASC')
                         ->join('e.fonction', 'f');
                        /* ->andWhere('e.entreprise =:user')
@@ -191,10 +196,13 @@ class DemandeController extends AbstractController
                 'edit' =>  new ActionRender(fn() => $etat == false),
                 'validation_directeur' =>  new ActionRender(fn() => false),
                 'validation_president' =>  new ActionRender(fn() => $etat == 'demande_valider_directeur' ),
-                'show' =>  new ActionRender(fn() => $etat == true),
-                /*'show' =>  new ActionRender(function () {
+               
+               /*  'show' =>  new ActionRender(function () {
                     return true;
-                }),*/
+                }), */
+                'show' =>  new ActionRender(function () {
+                    return false;
+                }),
 
             ];
         }else{
@@ -203,8 +211,11 @@ class DemandeController extends AbstractController
                 'validation_directeur' =>  new ActionRender(fn() => $etat == 'demande_initie'),
                 'validation_president' =>  new ActionRender(fn() => false),
                 //'imprimer' =>  new ActionRender(fn() => $etat == 'demande_livrer'),
-                'show' =>  new ActionRender(function () {
+               /*  'show' =>  new ActionRender(function () {
                     return true;
+                }), */
+                'shows' =>  new ActionRender(function () use ($etat){
+                    return  true
                 }),
                 'verification' => new ActionRender(fn() => $etat == 'document_enregistre'),
             ];
@@ -266,13 +277,21 @@ class DemandeController extends AbstractController
                                 ,  'render' => $renders['validation_president']
                             ],
                              
-                            'show' => [
+                            /* 'show' => [
                                 'target' => '#exampleModalSizeSm2',
                                 'url' => $this->generateUrl('app_demande_demande_show', ['id' => $value])
                                 , 'ajax' => true
                                 , 'icon' => '%icon% bi bi-eye'
                                 , 'attrs' => ['class' => 'btn-default']
                                 ,  'render' => $renders['show']
+                            ], */
+                            'shows' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('app_demande_demande_show_president', ['id' => $value])
+                                , 'ajax' => true
+                                , 'icon' => '%icon% bi bi-eye'
+                                , 'attrs' => ['class' => 'btn-default']
+                                ,  'render' => $renders['shows']
                             ]
                         ]
 
@@ -359,16 +378,16 @@ class DemandeController extends AbstractController
             ->setName('dt_app_demande_demande_'.$etat);
 
         $renders = [
-            'edit' =>  new ActionRender(function () {
+            'edit' =>  new ActionRender(function () use ($etat){
+                return $etat !='demande_valider_directeur';
+            }),
+            'show' =>  new ActionRender(function () use ($etat){
                 return true;
             }),
-            'show' =>  new ActionRender(function () {
-                return true;
+            'delete' => new ActionRender(function () use ($etat){
+                return $etat !='demande_valider_directeur';
             }),
-            'delete' => new ActionRender(function () {
-                return true;
-            }),
-            'document' =>  new ActionRender(fn() => $etat == 'demande_valider_attente_document'),
+            'document' =>  new ActionRender(fn() => ($etat !='demande_valider_directeur' && $etat == 'demande_valider_attente_document')),
 
         ];
 
@@ -398,11 +417,11 @@ class DemandeController extends AbstractController
                                 'url' => $this->generateUrl('app_demande_demande_edit', ['id' => $value])
                                 , 'ajax' => true
                                 , 'icon' => '%icon% bi bi-pen'
-                                , 'attrs' => ['class' => 'btn-default']
+                                , 'attrs' => ['class' => 'btn-default','tile'=>'yes']
                                 , 'render' => $renders['edit']
                             ],
                             'delete' => [
-                                'target' => '#exampleModalSizeNormal',
+                                'target' => '#exampleModalSizeSm2',
                                 'url' => $this->generateUrl('app_demande_demande_delete', ['id' => $value])
                                 , 'ajax' => true
                                 , 'icon' => '%icon% bi bi-trash'
@@ -419,7 +438,7 @@ class DemandeController extends AbstractController
                             ],
 
                             'show' => [
-                                'target' => '#exampleModalSizeNormal',
+                                'target' => '#exampleModalSizeSm2',
                                 'url' => $this->generateUrl('app_demande_demande_show', ['id' => $value])
                                 , 'ajax' => true
                                 , 'icon' => '%icon% bi bi-eye'
@@ -451,11 +470,16 @@ class DemandeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_demande_demande_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, DemandeRepository $demandeRepository, FormError $formError): Response
+    public function new(Request $request, DemandeRepository $demandeRepository,ElementMotifRepository $elementRepository,AvisRepository $avisRepository, FormError $formError): Response
     {
         $demande = new Demande();
         $date = new DateTime();
         $rest = $date->modify('+1 day');
+
+        $motif = new Motif();
+        $motif->setElement($elementRepository->find("MOT1"));
+        $demande->addMotif($motif);
+
         $demande->setDateDebut($rest);
         $form = $this->createForm(DemandeType::class, $demande, [
             'method' => 'POST',
@@ -477,13 +501,20 @@ class DemandeController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_demande_demande_index');
-
-
+          
 
 
             if ($form->isValid()) {
                 $demande->setDateCreation(new \DateTime());
-                $demande->setEtat("demande_initie");
+                if($this->security->getUser()->getGroupe()->getName() == "Directeurs"){
+                    $demande->setEtat("demande_valider_directeur");
+                    $demande->setAvis($avisRepository->findOneBy(array('code'=>'AV1')));
+                    $demande->setJustificationDirecteur('Demande permission directeur');
+                }else{
+                     $demande->setEtat("demande_initie");
+                }
+               
+                
                 $demandeRepository->save($demande, true);
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
@@ -535,7 +566,22 @@ class DemandeController extends AbstractController
             'form' => $form,
         ]);
     }
+    #[Route('/{id}/show/president', name: 'app_demande_demande_show_president', methods: ['GET'])]
+    public function showPresident(Request $request,Demande $demande): Response
+    {
+        $form = $this->createForm(DemandeWorkflowType::class, $demande, [
+            'method' => 'POST',
+            'action' => $this->generateUrl('app_demande_demande_show', [
+                'id' =>  $demande->getId()
+            ])
+        ]);
 
+
+        return $this->renderForm('demande/demande/shows.html.twig', [
+            'demande' => $demande,
+            'form' => $form,
+        ]);
+    }
     #[Route('/{id}/edit', name: 'app_demande_demande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Demande $demande, DemandeRepository $demandeRepository, FormError $formError): Response
     {
@@ -705,34 +751,11 @@ class DemandeController extends AbstractController
             $workflow = $this->workflow->get($demande, 'demande');
             //dd($form->getClickedButton()->getName());
             if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'validation'){
+                if ($form->getClickedButton()->getName() === 'passer'){
                     try {
 
                         if ($workflow->can($demande,'passer')){
                             $workflow->apply($demande, 'passer');
-                            $this->em->flush();
-                        }elseif($workflow->can($demande,'validation')){
-                            $workflow->apply($demande, 'validation');
-                            $this->em->flush();
-                        }elseif($workflow->can($demande,'accepatation_president')){
-                            $workflow->apply($demande, 'accepatation_president');
-                            $this->em->flush();
-                        }
-                        elseif($workflow->can($demande,'accepatation_president_attente_document')){
-                            $workflow->apply($demande, 'accepatation_president_attente_document');
-                            $this->em->flush();
-                        }
-                        elseif($workflow->can($demande,'document_enregister')){
-                            $workflow->apply($demande, 'document_enregister');
-                            $this->em->flush();
-                        }
-
-                        elseif($workflow->can($demande,'document_verification_accepte')){
-                            $workflow->apply($demande, 'document_verification_accepte');
-                            $this->em->flush();
-                        }
-                        elseif($workflow->can($demande,'document_verification_refuse')){
-                            $workflow->apply($demande, 'document_verification_refuse');
                             $this->em->flush();
                         }
                     } catch (LogicException $e) {
@@ -875,7 +898,7 @@ class DemandeController extends AbstractController
 
         return $this->renderForm('demande/demande/edit_workflow_president.html.twig', [
             'demande' => $demande,
-            'element' => $repository->findOneBySomeField($demande)[0],
+           /*  'element' => $repository->findOneBySomeField($demande)[0], */
             'form' => $form,
         ]);
     }

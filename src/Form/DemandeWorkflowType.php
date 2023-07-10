@@ -8,6 +8,7 @@ use App\Entity\Demande;
 use App\Entity\ElementMotif;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Security\Core\Security;
 
 class DemandeWorkflowType extends AbstractType
@@ -32,6 +34,25 @@ class DemandeWorkflowType extends AbstractType
         //dd($this->security->getUser());
 
         $builder
+        ->add('type', ChoiceType::class,
+        [   'placeholder'=>'Choissez un type de mande',
+            'required'     => false,
+            'expanded'     => false,
+            'attr' => ['class' => 'has-select2 type'],
+            'multiple' => false,
+            'choices'  => array_flip([
+                'TYPE_JOURNEE' => 'Toute la journée',
+                'TYPE_DEMI_JOURNEE' => 'Demi journée'
+            ]),
+        ])
+        ->add('heureDebut',TimeType::class,[
+            'input'  => 'datetime',
+            'widget' => 'single_text',
+        ])
+        ->add('heureFin',TimeType::class,[
+            'input'  => 'datetime',
+            'widget' => 'single_text',
+        ])
             ->add('dateDebut', DateType::class, [
                 "required" => false,
                 "widget" => 'single_text',

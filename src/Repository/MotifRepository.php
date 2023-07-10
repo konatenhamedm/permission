@@ -82,7 +82,7 @@ class MotifRepository extends ServiceEntityRepository
             ->andWhere('m.demande = :val')
             ->setParameter('val', $demande)
             ->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
     }
 }
