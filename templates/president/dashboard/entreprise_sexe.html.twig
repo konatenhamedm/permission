@@ -1,0 +1,108 @@
+{% block body %}
+    <div class="card card-tabs card-stretch card-custom card-sticky">
+        <div class="card-header card-header-stretch card-header-custom">
+            <h3 class="card-title"> Evolution par sexe et entreprise</h3>
+        </div> 
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="container"></div>
+                </div>
+               {#  <div class="col-md-4">
+
+                </div> #}
+            </div>
+               
+        </div> 
+    </div>
+{% endblock %}
+
+{% block java %}
+    
+    <script>
+        $(function () {
+            load_data();
+            function load_data(filters = []) {
+                $.getJSON("{{ path('app_rh_dashboard_hierarchie_sexe_data') }}", {filters: filters}, function (data) {
+                       Highcharts.setOptions({
+                        lang: {
+                                loading: 'Chargement...',
+                                months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+                                weekdays: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+                                shortMonths: ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'aoû', 'sep', 'oct', 'nov', 'déc'],
+                                exportButtonTitle: "Exporter",
+                                printButtonTitle: "Imprimer",
+                                rangeSelectorFrom: "Du",
+                                rangeSelectorTo: "au",
+                                rangeSelectorZoom: "Période",
+                                downloadPNG: 'Télécharger en PNG',
+                                downloadJPEG: 'Télécharger en JPEG',
+                                downloadPDF: 'Télécharger en PDF',
+                                downloadSVG: 'Télécharger en SVG',
+                                resetZoom: "Réinitialiser le zoom",
+                                resetZoomTitle: "Réinitialiser le zoom",
+                                thousandsSep: " ",
+                                decimalPoint: ',' 
+                            }        
+                    });
+                        Highcharts.chart('container', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: null,
+                            align: 'left'
+                        },
+                        xAxis: {
+                            categories: data.xAxis
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: 'Total'
+                            },
+                            stackLabels: {
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: ( // theme
+                                        Highcharts.defaultOptions.title.style &&
+                                        Highcharts.defaultOptions.title.style.color
+                                    ) || 'gray',
+                                    textOutline: 'none'
+                                }
+                            }
+                        },
+                        legend: {
+                           // align: 'left',
+                           // x: 70,
+                         //   verticalAlign: 'bottom',
+                            //y: 70,
+                            //floating: true,
+                            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+                            borderColor: '#CCC',
+                            borderWidth: 1,
+                            shadow: false
+                        },
+                          tooltip: {
+                                format: '<b>{key}</b><br/>{series.name}: {y}<br/>' +
+                                    'Total: {point.stackTotal}'
+                             },
+                       
+                        plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        series: data.series
+                    });
+                });
+            }
+
+
+        });
+    </script>
+{% endblock %}

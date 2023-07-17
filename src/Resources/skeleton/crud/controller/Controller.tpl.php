@@ -8,11 +8,12 @@ use App\Controller\BaseController;
 #[Route('<?= $route_path ?>')]
 class <?= $class_name ?> extends BaseController
 {
+    const INDEX_ROOT_NAME = '<?= $route_name ?>'.'_index';
 <?= $generator->generateRouteForControllerMethod('/', sprintf('%s_index', $route_name), ['GET', 'POST']) ?>
 <?php if (isset($repository_full_class_name)): ?>
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
-    const INDEX_ROOT_NAME = $route_name;
+    
 
     $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
 

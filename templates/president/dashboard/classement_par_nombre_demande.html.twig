@@ -1,0 +1,131 @@
+ {% block body %}
+     {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="card card-tabs card-stretch card-custom card-sticky">
+        <div class="card-header card-header-stretch card-header-custom">
+            <h3 class="card-title">Classement par nombre</h3>
+        </div> 
+        <div class="card-body">
+         {{ form_start(form)}}
+                            <div class="row">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-6">{{ form_row(form.entreprise) }}</div>
+                                <div class="col-md-3"></div>
+                               
+                            </div>
+                        {{ form_end(form, {render_rest: false}) }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="filter-block d-flex justify-content-center">
+                       
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-error"></div>
+                  
+                    <figure class="highcharts-figure">
+                        <div id="container"></div>
+                    </figure>
+                </div>
+                {# <div class="col-md-4">
+
+                </div> #}
+            </div>
+               
+        </div> 
+    </div>
+{% endblock %}
+
+{% block java %}
+  
+<script src="https://code.highcharts.com/modules/pictorial.js"></script>
+    <script>
+    
+        $(function () {
+            init_select2();
+           
+           // load_data();
+
+           
+            const $entreprise = $('#{{ form.entreprise.vars.id }}');
+           
+            
+           
+            const $error = $('.alert-error');
+            $entreprise.on('change', function () {
+                const $this = $(this);
+               
+                const current_value = $this.find('option:selected').attr('value');
+               
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {entreprise: $this.val()});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+
+            function load_data(entreprise, filters = []) {
+                $.getJSON("{{ path('app_president_dashboard_api_demande_classement_nombre') }}", {filters: filters}, function (data) {
+console.log(data.series)
+Highcharts.chart('container', {
+    chart: {
+        type: 'cylinder',
+        options3d: {
+            enabled: true,
+            alpha: 15,
+            beta: 15,
+            depth: 50,
+            viewDistance: 25
+        }
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: 'Source: ' +
+            '<a href="https://www.fhi.no/en/id/infectious-diseases/coronavirus/daily-reports/daily-reports-COVID19/"' +
+            'target="_blank">FHI</a>'
+    },
+    xAxis: {
+        categories:['0-4',
+            '5-19',
+            '20-29',
+            '30-39',
+            '40-49',
+            '50+',
+    ],
+        title: {
+            text: 'Age groups'
+        }
+    },
+    yAxis: {
+        title: {
+            margin: 20,
+            text: 'Reported cases'
+        }
+    },
+    tooltip: {
+        headerFormat: '<b>Age: {point.x}</b><br>'
+    },
+    plotOptions: {
+        series: {
+            depth: 25,
+            colorByPoint: true
+        }
+    },
+    series: [data.series]
+});
+                })
+
+            }   
+        })
+         
+
+                
+        
+    </script>
+{% endblock %}

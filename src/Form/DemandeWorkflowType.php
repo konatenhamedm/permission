@@ -135,8 +135,8 @@ class DemandeWorkflowType extends AbstractType
             ->add('accepatation_president',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-warning btn-ajax btn-sm']])
             ->add('accepatation_president_attente_document',SubmitType::class,['label' => 'Accepte et attente document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
             ->add('document_enregister',SubmitType::class,['label' => 'Soumettre le document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('document_verification_accepte',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-primary btn-ajax btn-sm']])
-            ->add('document_verification_refuse',SubmitType::class,['label' => 'Rejeter le document', 'attr' => ['class' => 'btn btn-primary btn-ajax btn-sm']])
+            ->add('document_verification_accepte',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            /* ->add('document_verification_refuse',UrlT::class,['label' => 'Rejeter le document', 'attr' => ['class' => 'btn btn-danger  btn-sm','data-bs-stacked-toggle'=>"modal" ,'data-bs-stacked-modal'=>"#exampleModalSizeLg1",'href'=>"{{ path('app_demande_demande_show_president',{'id':8 }) }}",]]) */
         ;
     }
 

@@ -33,7 +33,7 @@ class GroupeController extends BaseController
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-
+//dd($this->security->getUser()->getGroupe()->getId());
 
 
         $table = $dataTableFactory->create()

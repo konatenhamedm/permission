@@ -1,0 +1,147 @@
+ {% block body %}
+     {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="card card-tabs card-stretch card-custom card-sticky">
+        <div class="card-header card-header-stretch card-header-custom">
+            <h3 class="card-title"> Evolution demande par mois et entreprise</h3>
+        </div> 
+        <div class="card-body">
+        {{ form_start(form)}}
+                            <div class="row">
+                                <div class="col-md-6">{{ form_row(form.dateDebut) }}</div>
+                                <div class="col-md-6">{{ form_row(form.entreprise) }}</div>
+                            </div>
+                        {{ form_end(form, {render_rest: false}) }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="filter-block d-flex justify-content-center">
+                       
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-error"></div>
+                    <div id="container"></div>
+                </div>
+                {# <div class="col-md-4">
+
+                </div> #}
+            </div>
+               
+        </div> 
+    </div>
+{% endblock %}
+
+{% block java %}
+    
+    <script>
+        $(function () {
+            init_select2();
+           // load_data();
+           
+
+         
+            const $dateDebut = $('#{{ form.dateDebut.vars.id }}');
+              const $entreprise = $('#{{ form.entreprise.vars.id }}');
+            const $error = $('.alert-error');
+            $entreprise.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('data-value');
+                  var date = $('.date').find('option:selected').attr('value')
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {date: date ,entreprise: $this.val()});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+
+        $dateDebut.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                 var entreprise = $('.entreprise').find('option:selected').attr('value')
+            // alert(current_value)
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {date: $this.val(),entreprise: entreprise});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+            function load_data(contrat, filters = []) {
+                $.getJSON("{{ path('app_president_dashboard_api_courbe_demande_entreprise_month_filtre_annee_entreprise') }}", {filters: filters}, function (data) {
+                    console.log(data.series);
+                       // Data retrieved https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature
+                        Highcharts.setOptions({
+                        lang: {
+                                loading: 'Chargement...',
+                                months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+                                weekdays: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+                                shortMonths: ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'aoû', 'sep', 'oct', 'nov', 'déc'],
+                                exportButtonTitle: "Exporter",
+                                printButtonTitle: "Imprimer",
+                                rangeSelectorFrom: "Du",
+                                rangeSelectorTo: "au",
+                                rangeSelectorZoom: "Période",
+                                downloadPNG: 'Télécharger en PNG',
+                                downloadJPEG: 'Télécharger en JPEG',
+                                downloadPDF: 'Télécharger en PDF',
+                                downloadSVG: 'Télécharger en SVG',
+                                resetZoom: "Réinitialiser le zoom",
+                                resetZoomTitle: "Réinitialiser le zoom",
+                                thousandsSep: " ",
+                                decimalPoint: ',' 
+                            }        
+                    });
+                Highcharts.chart('container', {
+                    chart: {
+                        type: 'spline'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: 'Source: ' +
+                            '<a href="https://www.appatam.com/" ' +
+                            'target="_blank">appatam.com</a>'
+                    },
+                    xAxis: {
+                        categories: data.mois ,
+                        accessibility: {
+                            description: ''
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Nombre'
+                        },
+                        labels: {
+                            format: '{value}'
+                        }
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#FF6600',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: data.series
+                });
+
+                                });
+            }
+
+
+        });
+    </script>
+{% endblock %}

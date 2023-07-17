@@ -39,6 +39,15 @@ class MotifRepository extends ServiceEntityRepository
         }
     }
 
+    public function getDocumentCourrier($demande){
+        return $this->createQueryBuilder('d')
+            ->select('f.path','f.alt','f.id')
+            ->join('d.fichier','f')
+            ->andWhere('d.demande =:demande')
+            ->setParameter('demande', $demande)
+            ->getQuery()
+            ->getResult(); }
+
 //    /**
 //     * @return Motif[] Returns an array of Motif objects
 //     */

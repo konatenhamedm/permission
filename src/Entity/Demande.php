@@ -23,7 +23,7 @@ class Demande
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:true)]
-    #[Assert\Expression("this.getDateDebut() < this.getDateFin()",message:"La date fin ne doit pas être antérieure ou egale  à la date début")]
+   
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandes')]
@@ -64,6 +64,9 @@ class Demande
 
     #[ORM\Column(type: Types::TIME_MUTABLE,nullable:true)]
     private ?\DateTimeInterface $heureFin = null;
+
+    #[ORM\Column(length: 255,nullable:true)]
+    private ?string $alerte = null;
 
     public function __construct()
     {
@@ -257,6 +260,18 @@ class Demande
     public function setHeureFin($heureFin): static
     {
         $this->heureFin = $heureFin;
+
+        return $this;
+    }
+
+    public function getAlerte(): ?string
+    {
+        return $this->alerte;
+    }
+
+    public function setAlerte(string $alerte): static
+    {
+        $this->alerte = $alerte;
 
         return $this;
     }

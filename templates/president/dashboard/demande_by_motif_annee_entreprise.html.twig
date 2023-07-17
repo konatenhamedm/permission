@@ -1,0 +1,120 @@
+ {% block body %}
+     {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="card card-tabs card-stretch card-custom card-sticky">
+        <div class="card-header card-header-stretch card-header-custom">
+            <h3 class="card-title"> Evolution demande par mois et entreprise</h3>
+        </div> 
+        <div class="card-body">
+        {{ form_start(form)}}
+                            <div class="row">
+                                <div class="col-md-6">{{ form_row(form.dateDebut) }}</div>
+                                <div class="col-md-6">{{ form_row(form.entreprise) }}</div>
+                            </div>
+                        {{ form_end(form, {render_rest: false}) }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="filter-block d-flex justify-content-center">
+                       
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-error"></div>
+                    <div id="container"></div>
+                </div>
+                {# <div class="col-md-4">
+
+                </div> #}
+            </div>
+               
+        </div> 
+    </div>
+{% endblock %}
+
+{% block java %}
+    <script src="https://code.highcharts.com/modules/cylinder.js"></script>
+<script src="https://code.highcharts.com/modules/funnel3d.js"></script>
+    <script>
+        $(function () {
+            init_select2();
+           // load_data();
+            const $dateDebut = $('#{{ form.dateDebut.vars.id }}');
+              const $entreprise = $('#{{ form.entreprise.vars.id }}');
+            const $error = $('.alert-error');
+            $entreprise.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('data-value');
+                  var date = $('.date').find('option:selected').attr('value')
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {date: date ,entreprise: $this.val()});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+
+        $dateDebut.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                 var entreprise = $('.entreprise').find('option:selected').attr('value')
+            // alert(current_value)
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {date: $this.val(),entreprise: entreprise});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+            function load_data(contrat, filters = []) {
+                $.getJSON("{{ path('app_president_dashboard_api_demande_by_motif_annee_by_entreprise') }}", {filters: filters}, function (data) {
+                    console.log(data.series);
+                       // Data retrieved https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature
+                   
+  // Data retrieved from https://netmarketshare.com/
+// Build the chart
+Highcharts.chart('container', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Browser market shares in March, 2022',
+        align: 'left'
+    },
+    tooltip: {
+        pointFormat: '{data.series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    accessibility: {
+        point: {
+            valueSuffix: '%'
+        }
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: false
+            },
+            showInLegend: true
+        }
+    },
+    series: [
+        data.series.series
+    ]
+});
+
+
+            });
+            }
+
+
+        });
+    </script>
+{% endblock %}

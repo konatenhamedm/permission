@@ -1,0 +1,131 @@
+ {% block body %}
+     {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="card card-tabs card-stretch card-custom card-sticky">
+        <div class="card-header card-header-stretch card-header-custom">
+            <h3 class="card-title"> Evolution des demandes par entreprise</h3>
+        </div> 
+        <div class="card-body">
+        {{ form_start(form)}}
+                            <div class="row">
+                                <div class="col-md-6">{{ form_row(form.dateDebut) }}</div>
+                                <div class="col-md-6">{{ form_row(form.dateFin) }}</div>
+                            </div>
+                        {{ form_end(form, {render_rest: false}) }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="filter-block d-flex justify-content-center">
+                       
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-error"></div>
+                    <div id="container"></div>
+                </div>
+                {# <div class="col-md-4">
+
+                </div> #}
+            </div>
+               
+        </div> 
+    </div>
+{% endblock %}
+
+{% block java %}
+    
+    <script>
+        $(function () {
+            init_select2();
+            //load_data();
+           
+
+            const $dateFin = $('#{{ form.dateFin.vars.id }}');
+            const $dateDebut = $('#{{ form.dateDebut.vars.id }}');
+            
+           
+            const $error = $('.alert-error');
+            $dateFin.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                 var initialDebut =  $('.dateDebut').find('option:selected').attr('value')
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {dateFin: $this.val(),dateDebut:initialDebut});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+
+        $dateDebut.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                 var initialFin = $('.dateFin').find('option:selected').attr('value')
+            // alert(current_value)
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {dateDebut: $this.val(),dateFin: initialFin});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+            function load_data(contrat, filters = []) {
+                $.getJSON("{{ path('app_president_dashboard_api_demande_entreprise_filtre_annee') }}", {filters: filters}, function (data) {
+                    console.log(data.series);
+                        Highcharts.chart('container', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: 'Evolution des demande par entreprise'
+                        },
+                        subtitle: {
+                            text: contrat
+                        },
+                        xAxis: {
+                            categories: data.entreprises,
+                            crosshair: true,
+                            title: {
+                                text: 'Entreprises'
+                            },
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                            text: ''
+                            }
+                        },
+                        tooltip: {
+                            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                            '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                            footerFormat: '</table>',
+                            shared: true,
+                            useHTML: true
+                        },
+                        plotOptions: {
+                            series: {
+                                borderWidth: 0,
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '{point.y:.1f}'
+                                }
+                            }
+                         },
+                        /*series: [{
+                            name: 'Data',
+                            data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 124.1, 95.6, 54.4]
+
+                        }]*/
+                        series: data.series
+                    });
+                });
+            }
+
+
+        });
+    </script>
+{% endblock %}

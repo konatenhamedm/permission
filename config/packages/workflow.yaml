@@ -32,14 +32,14 @@ framework:
           from: demande_valider_directeur
           to: demande_valider_attente_document
         document_enregister:
-          from: demande_valider_attente_document
-          to: document_enregistre
-        document_verification_accepte:
-          from: document_enregistre
-          to: demande_valider
-        document_verification_refuse:
           from: document_enregistre
           to: demande_valider_attente_document
+        document_verification_accepte:
+          from: demande_valider_attente_document
+          to: demande_valider
+        document_verification_refuse:
+          from: demande_valider_attente_document
+          to: document_enregistre
         demande_refuser:
           from: demande_initie
           to: demande_refuser

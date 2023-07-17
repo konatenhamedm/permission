@@ -50,74 +50,6 @@ class DemandeController extends AbstractController
         $this->em = $em;
     }
 
-
-
-
-    #[Route('/', name: 'app_demande_demande_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
-    {//dd($this->security->getUser()->getGroupe()->getName());
-        $etats = ['demande_initie' => 'Approbation directeur',
-            'demande_valider_directeur' => 'Approbation président',
-            'demande_valider_attente_document' => 'Documents',
-            'document_enregistre' => 'Vérification Document',
-            'demande_valider' => 'Demandes traitées',
-            'demande_refuser' => 'Demandes réfusées',
-
-        ];
-        $tabs = [];
-        foreach ($etats as $etat => $label) {
-            $tabs[] =  [
-                'name' => $etat,
-                'label' => $label,
-                'url' => $this->generateUrl('app_demande_demande_ls', ['etat' => $etat])
-            ];
-        }
-
-
-        return $this->render('demande/demande/index.html.twig', [
-            'tabs' => $tabs,
-            'titre'=>"Liste des demandes"
-        ]);
-    }
-
-    #[Route('/avis', name: 'app_demande_demande_index_avis', methods: ['GET', 'POST'])]
-    public function indexavis(Request $request, DataTableFactory $dataTableFactory): Response
-    {
-//dd($this->security->getUser()->getGroupe()->getName());
-        if($this->security->getUser()->getGroupe()->getName() == "Présidents"){
-            $etats = [
-                'demande_valider_directeur' => 'Attente approbation',
-                'demande_valider_attente_document' => 'Documents',
-                'document_enregistre' => 'Vérification Document',
-                'demande_valider' => 'Demandes validées',
-                'demande_refuser' => 'Demandes réfusées',
-
-            ];
-        }else{
-            $etats = ['demande_initie' => 'Attente approbation',
-                'demande_valider_attente_document' => 'Documents',
-                'document_enregistre' => 'Vérification Document',
-                'demande_valider' => 'Demandes validées',
-                'demande_refuser' => 'Demandes réfusées',
-
-            ];
-        }
-
-        $tabs = [];
-        foreach ($etats as $etat => $label) {
-            $tabs[] =  [
-                'name' => $etat,
-                'label' => $label,
-                'url' => $this->generateUrl('app_demande_demande_avis_ls', ['etat' => $etat])
-            ];
-        }
-
-
-        return $this->render('demande/demande/index_avis.html.twig', [
-            'tabs' => $tabs,
-            'titre'=>"Liste des demandes"
-        ]);
-    }
     #[Route('/{etat}/liste/avis', name: 'app_demande_demande_avis_ls', methods: ['GET', 'POST'])]
     public function listeavis(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
     {
@@ -215,7 +147,7 @@ class DemandeController extends AbstractController
                     return true;
                 }), */
                 'shows' =>  new ActionRender(function () use ($etat){
-                    return  true
+                    return  true;
                 }),
                 'verification' => new ActionRender(fn() => $etat == 'document_enregistre'),
             ];
@@ -317,8 +249,48 @@ class DemandeController extends AbstractController
         ]);
     }
 
-    #[Route('/{etat}/liste', name: 'app_demande_demande_ls', methods: ['GET', 'POST'])]
-    public function liste(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
+    #[Route('/avis', name: 'app_demande_demande_index_avis', methods: ['GET', 'POST'])]
+    public function indexavis(Request $request, DataTableFactory $dataTableFactory): Response
+    {
+//dd($this->security->getUser()->getGroupe()->getName());
+        if($this->security->getUser()->getGroupe()->getName() == "Présidents"){
+            $etats = [
+                'demande_valider_directeur' => 'Attente approbation',
+                'demande_valider_attente_document' => 'Documents',
+                'document_enregistre' => 'Vérification Document',
+                'demande_valider' => 'Demandes validées',
+                'demande_refuser' => 'Demandes réfusées',
+
+            ];
+        }else{
+            $etats = ['demande_initie' => 'Attente approbation',
+                'demande_valider_attente_document' => 'Documents',
+                'document_enregistre' => 'Vérification Document',
+                'demande_valider' => 'Demandes validées',
+                'demande_refuser' => 'Demandes réfusées',
+
+            ];
+        }
+
+        $tabs = [];
+        foreach ($etats as $etat => $label) {
+            $tabs[] =  [
+                'name' => $etat,
+                'label' => $label,
+                'url' => $this->generateUrl('app_demande_demande_avis_ls', ['etat' => $etat])
+            ];
+        }
+
+
+        return $this->render('demande/demande/index_avis.html.twig', [
+            'tabs' => $tabs,
+            'titre'=>"Liste des demandes"
+        ]);
+    }
+    
+
+    #[Route('/{etat}', name: 'app_demande_demande_index', methods: ['GET', 'POST'])]
+    public function index(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
     {
         $table = $dataTableFactory->create()
             ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut','format' => 'd-m-Y',"searchable"=>true,'globalSearchable'=>true])
@@ -463,7 +435,7 @@ class DemandeController extends AbstractController
 
 
 
-        return $this->render('demande/demande/liste.html.twig', [
+        return $this->render('demande/demande/index.html.twig', [
             'datatable' => $table,
             'etat' => $etat
         ]);
@@ -567,7 +539,7 @@ class DemandeController extends AbstractController
         ]);
     }
     #[Route('/{id}/show/president', name: 'app_demande_demande_show_president', methods: ['GET'])]
-    public function showPresident(Request $request,Demande $demande): Response
+    public function showPresident(Request $request,Demande $demande,MotifRepository $motifRepository): Response
     {
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
             'method' => 'POST',
@@ -580,6 +552,7 @@ class DemandeController extends AbstractController
         return $this->renderForm('demande/demande/shows.html.twig', [
             'demande' => $demande,
             'form' => $form,
+            'documents' => $motifRepository->getDocumentCourrier($demande),
         ]);
     }
     #[Route('/{id}/edit', name: 'app_demande_demande_edit', methods: ['GET', 'POST'])]
@@ -798,110 +771,6 @@ class DemandeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit/workflow_president', name: 'app_demande_demande_edit_workflow_president', methods: ['GET', 'POST'])]
-    public function editWorkflowPresident(Request $request, Demande $demande, DemandeRepository $demandeRepository,MotifRepository $repository, FormError $formError): Response
-    {
-/*dd();*/
-        $form = $this->createForm(DemandeWorkflowType::class, $demande, [
-            'method' => 'POST',
-            'action' => $this->generateUrl('app_demande_demande_edit_workflow_president', [
-                'id' =>  $demande->getId()
-            ])
-        ]);
-    //    dd($form->getData());
-
-        /*foreach ($form->getData()->getAvis()-as $el){
-
-            $demande->
-        }*/
-
-        $data = null;
-        $statutCode = Response::HTTP_OK;
-
-        $isAjax = $request->isXmlHttpRequest();
-
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            $response = [];
-            $redirect = $this->generateUrl('app_demande_demande_index_avis');
-            $workflow = $this->workflow->get($demande, 'demande');
-
-            if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'accepatation_president'){
-                    try {
-
-                     if($workflow->can($demande,'accepatation_president')){
-                            $workflow->apply($demande, 'accepatation_president');
-                            $this->em->flush();
-                        }
-
-                    } catch (LogicException $e) {
-
-                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
-                    }
-
-                    $demandeRepository->save($demande, true);
-                }elseif($form->getClickedButton()->getName() === 'refuser_president'){
-                    try {
-
-                        if($workflow->can($demande,'demande_refuser_president')){
-                               $workflow->apply($demande, 'demande_refuser_president');
-                               $this->em->flush();
-                           }
-   
-                       } catch (LogicException $e) {
-   
-                           $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
-                       }
-   
-                       $demandeRepository->save($demande, true);
-                }
-                elseif($form->getClickedButton()->getName()== 'accepatation_president_attente_document'){
-                    if($workflow->can($demande,'accepatation_president_attente_document')){
-                        $workflow->apply($demande, 'accepatation_president_attente_document');
-                        $this->em->flush();
-                    }
-                    $demandeRepository->save($demande, true);
-                }
-
-                else{
-                    $demandeRepository->save($demande, true);
-                   // return $this->redirect('app_demande_demande_index_avis');
-                }
-                $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
-                $this->addFlash('success', $message);
-
-
-            } else {
-                $message = $formError->all($form);
-                $statut = 0;
-                $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-                if (!$isAjax) {
-                    $this->addFlash('warning', $message);
-                }
-
-            }
-
-
-            if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
-            } else {
-                if ($statut == 1) {
-                    return $this->redirect($redirect, Response::HTTP_OK);
-                }
-            }
-        }
-
-        return $this->renderForm('demande/demande/edit_workflow_president.html.twig', [
-            'demande' => $demande,
-           /*  'element' => $repository->findOneBySomeField($demande)[0], */
-            'form' => $form,
-        ]);
-    }
 
 
     #[Route('/{id}/edit/workflow_document', name: 'app_demande_demande_edit_workflow_document', methods: ['GET', 'POST'])]
@@ -935,7 +804,7 @@ class DemandeController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_demande_demande_index');
+            $redirect = $this->generateUrl('app_config_demande_index');
             $workflow = $this->workflow->get($demande, 'demande');
 
             if ($form->isValid()) {
@@ -987,7 +856,7 @@ class DemandeController extends AbstractController
 
         return $this->renderForm('demande/demande/edit_document.html.twig', [
             'demande' => $demande,
-            'element' => $repository->findOneBySomeField($demande)[0],
+            /* 'element' => $repository->findOneBySomeField($demande)[0], */
             'form' => $form,
         ]);
     }
@@ -1023,7 +892,7 @@ class DemandeController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_demande_demande_index');
+            $redirect = $this->generateUrl('app_config_demande_index');
             $workflow = $this->workflow->get($demande, 'demande');
 
             if ($form->isValid()) {

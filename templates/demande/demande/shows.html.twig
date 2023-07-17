@@ -100,11 +100,49 @@
 
 
         </div>
+          <br>
+        <div class="row">
+        <h2>Liste des documents joints à la demande </h2><br>
+        <table class="table table-rounded table-bordered border gy-3 gs-3">
+            <thead  >
+
+            </thead>
+            <tbody>
+            {% if(documents |length > 0) %}
+                {% for doc in documents %}
+                    <tr id="element-1" class="border-bottom border-gray-200" style="background-color: #fff">
+                    <td colspan="4" >
+
+                        <div class="form-group">
+                            <div class="list-group">
+                                <a class="list-group-item" href="{{ path('fichier_index', {id:  doc.id}) }}" target="_blank">
+                                    <span class="fa fa-paperclip"></span> {{ doc.alt }}
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                {% endfor %}
+
+                </tr>
+            {% else %}
+                <tr id="element-1" class="border-bottom border-gray-200" style="background-color: #fff">
+                    <td colspan="4" >
+                        <h4>Il n'y a aucun document</h4>
+                    </td>
+                </tr>
+            {% endif %}
+
+
+            </tbody></table>
+        </div>
          <div class="row">
                 <h3 style="color:#3498db">Motif demandeur</h3>
             </div>
         <br>
         {{ prototype_ligne_colonne(form) }}
+
+
+
 
 
     </div>

@@ -17,21 +17,26 @@
 
       {#  <div id="list-ligne" data-prototype="{{ list_ligne_motif(form.motifs.vars.prototype, 1)|e }}"></div>#}
         {{ include('_includes/ajax/response.html.twig') }}
-<div class="row">
+<div class="" style="border-bottom:3px solid #000">
+
+
+                <!--begin::Input group-->
+                <div class="row">
+                    <h3 style="color:#3498db">Infos demande</h3>
+                </div>
+             <div class="row">
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Type*</label>
                 {{ form_widget(form.type,{attr:{'readonly':'readonly'}}) }}</div>
                   <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Date debut*</label>
-                {{ form_widget(form.dateDebut) }}</div>
+                {{ form_widget(form.dateDebut,{attr:{'readonly':'readonly'}}) }}</div>
         </div>
-
-        <div class="row my-3 py-5" style="border-bottom:3px solid #000">
-                 <div class=" journee">
+        <div class="row journee">
           
             <div class="form-group col-md-8">
                 <label class="sr-onl" for="userinput1">Date fin*</label>
-                {{ form_widget(form.dateFin) }}</div>
+                {{ form_widget(form.dateFin,{attr:{'readonly':'readonly'}}) }}</div>
 
             <div class="form-group col-md-4">
                 <label class="sr-onl" for="userinput1">Nombre de jour(inclus)*</label>
@@ -39,24 +44,90 @@
                </div>
 
         </div>
-        <div class="demi">
+        <div class="row demi">
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Heure debut*</label>
-                {{ form_widget(form.heureDebut) }}</div>
+                {{ form_widget(form.heureDebut,{attr:{'readonly':'readonly'}}) }}</div>
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Heure Fin*</label>
-                {{ form_widget(form.heureFin) }}</div>
+                {{ form_widget(form.heureFin,{attr:{'readonly':'readonly'}}) }}</div>
 
 
         </div>
-
+        <div style="border-bottom:3px solid #000"><br>
         </div>
-        <br>
-          <div class="row">
-                    <h3 style="color:red">Ajouter document</h3>
+            <div class="row">
+                <h3 style="color:#3498db">Avis directeur</h3>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="fv-row mb-10">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">Donner un avis</label>
+                        {{ form_widget(form.avis,{attr:{'readonly':'readonly'}}) }}
+                    </div>
                 </div>
-        {{ prototype_ligne_colonne(form) }}
+                <div class="col-md-6">
+                    <div class="fv-row mb-10 justification">
+                        <label class="required fw-semibold fs-6 mb-2">Justification </label>
+                        {{ form_widget(form.justificationDirecteur,{attr:{'readonly':'readonly'}}) }}
+                    </div>
+                </div>
 
+            </div>
+  <div style="border-bottom:3px solid #000"><br>
+        </div>
+                <div class="row">
+                    <h3 style="color:red">Avis président</h3>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="fv-row mb-10">
+                            <!--begin::Label-->
+                            <label class="required fw-semibold fs-6 mb-2">Donner un avis</label>
+                            {{ form_widget(form.avisPresident,{attr:{'readonly':'readonly'}}) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="fv-row mb-10 justification">
+                            <label class="required fw-semibold fs-6 mb-2">Justification</label>
+                            {{ form_widget(form.justificationPresident,{attr:{'readonly':'readonly'}}) }}
+                        </div>
+                    </div>
+
+                </div>
+                <!--end::Input group-->
+
+
+
+        </div><br>
+         <div class="row">
+                <h3 style="color:#3498db">Ajouter document</h3>
+            </div>
+        <br>
+        {% if demande.alerte != null %}
+
+        <div class="row">
+          <div class="alert alert-danger d-flex align-items-center p-5">
+    <!--begin::Icon-->
+    <span class="svg-icon svg-icon-2hx svg-icon-primary me-3">...</span>
+    <!--end::Icon-->
+
+    <!--begin::Wrapper-->
+    <div class="d-flex flex-column">
+        <!--begin::Title-->
+        <h4 class="mb-1 text-dark">Message alerte document</h4>
+        <!--end::Title-->
+        <!--begin::Content-->
+        <span>{{ demande.alerte }}</span>
+        <!--end::Content-->
+    </div>
+    <!--end::Wrapper-->
+</div>
+
+        </div>
+        {% endif %}
+        {{ prototype_ligne_colonne(form) }}
 
     </div>
     <div class="modal-footer">

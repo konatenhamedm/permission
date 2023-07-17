@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\ModuleGroupePermition;
 use App\Entity\ConfigApp;
+use App\Entity\Demande;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -54,6 +55,16 @@ class Menu
             dd("rrrr");
         }*/
         //$this->getPermission();
+    }
+
+    public function nombreDemande($etat,$entreprise){
+        $repo = $this->em->getRepository(Demande::class)->nombreDemande($etat,$entreprise);
+        return $repo;
+    }
+
+    public function nombreDemandeStat($etat,$user){
+        $repo = $this->em->getRepository(Demande::class)->nombreDemandeStat($etat,$user);
+        return $repo;
     }
 
     public function listeModule()

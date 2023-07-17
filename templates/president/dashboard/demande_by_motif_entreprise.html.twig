@@ -1,0 +1,143 @@
+ {% block body %}
+     {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="card card-tabs card-stretch card-custom card-sticky">
+        <div class="card-header card-header-stretch card-header-custom">
+            <h3 class="card-title"> Evolution demande par mois et entreprise</h3>
+        </div> 
+        <div class="card-body">
+        {{ form_start(form)}}
+                            <div class="row">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-6">{{ form_row(form.dateDebut) }}</div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        {{ form_end(form, {render_rest: false}) }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="filter-block d-flex justify-content-center">
+                       
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert-error"></div>
+                    <div id="container"></div>
+                </div>
+                {# <div class="col-md-4">
+
+                </div> #}
+            </div>
+               
+        </div> 
+    </div>
+{% endblock %}
+
+{% block java %}
+    <script src="https://code.highcharts.com/modules/cylinder.js"></script>
+<script src="https://code.highcharts.com/modules/funnel3d.js"></script>
+    <script>
+        $(function () {
+            init_select2();
+           // load_data();
+            const $dateDebut = $('#{{ form.dateDebut.vars.id }}');
+              const $entreprise = $('#{{ form.entreprise.vars.id }}');
+            const $error = $('.alert-error');
+         
+
+            $dateDebut.on('change', function () {
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {date: $this.val()});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+            function load_data(contrat, filters = []) {
+                $.getJSON("{{ path('app_president_dashboard_api_demande_by_motif_by_entreprise') }}", {filters: filters}, function (data) {
+                    console.log(data.series);
+                       // Data retrieved https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature
+                   
+  // Data retrieved from https://netmarketshare.com/
+// Build the chart
+// Data retrieved from https://www.ssb.no/statbank/table/10467/
+                    const chart = Highcharts.chart('container', {
+
+                        chart: {
+                            type: 'column'
+                        },
+
+                        title: {
+                            text: ''
+                        },
+
+                        subtitle: {
+                            text: ''
+                        },
+
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'middle',
+                            layout: 'vertical'
+                        },
+
+                        xAxis: {
+                            categories: data.motif,
+                            labels: {
+                                x: -10
+                            }
+                        },
+
+                        yAxis: {
+                            allowDecimals: false,
+                            title: {
+                                text: 'Nombres'
+                            }
+                        },
+
+                        series: data.series,
+
+                        responsive: {
+                            rules: [{
+                                condition: {
+                                    maxWidth: 500
+                                },
+                                chartOptions: {
+                                    legend: {
+                                        align: 'center',
+                                        verticalAlign: 'bottom',
+                                        layout: 'horizontal'
+                                    },
+                                    yAxis: {
+                                        labels: {
+                                            align: 'left',
+                                            x: 0,
+                                            y: -5
+                                        },
+                                        title: {
+                                            text: null
+                                        }
+                                    },
+                                    subtitle: {
+                                        text: null
+                                    },
+                                    credits: {
+                                        enabled: false
+                                    }
+                                }
+                            }]
+                                }
+                            });
+
+                     });
+            }
+
+
+        });
+    </script>
+{% endblock %}
