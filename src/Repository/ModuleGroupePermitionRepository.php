@@ -49,6 +49,7 @@ class ModuleGroupePermitionRepository extends ServiceEntityRepository
         ->innerJoin('m.groupeUser','gu')
         ->andWhere('gm.lien = :lien')
         ->andWhere('gu.id = :val')
+        //->andWhere('m.menuPrincipal = 1')
         ->setParameters(['val'=> $groupe,'lien'=>$lien])
         /*  ->setMaxResults(10)*/
         ->getQuery()

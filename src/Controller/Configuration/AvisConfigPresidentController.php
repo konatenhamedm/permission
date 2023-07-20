@@ -112,6 +112,7 @@ class AvisConfigPresidentController extends BaseController
                 ],
                 [
                     'label' => 'Socopi',
+                    'affiche_total'=>'true',
                     'etat'=>'demande_valider_directeur',
                     'id' => 'param_validation_demande_socopi',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_directeur','entreprise' => 'socopi'])

@@ -1,8 +1,8 @@
-
+{#
 {% extends 'base-layout.html.twig' %}
 
 {% block title %}Liste des employes{% endblock %}
-
+#}
 
 {% block body %}
 <div class="card shadow-sm">
@@ -31,7 +31,7 @@
         <div class="row">
             <div class="col-sm-12">
                 {% if permition != null %}
-                    <div id="grid_app_utilisateur_employe_infos_directeur" class="grid-dt-wrapper">Chargement....</div>
+                    <div id="grid_app_utilisateur_employe_infos" class="grid-dt-wrapper">Chargement....</div>
                 {% else %}
                     <div class="d-flex flex-column flex-center flex-column-fluid">
                         <!--begin::Content-->
@@ -71,9 +71,9 @@
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
     <script> 
         $(function() { 
-              $('#grid_app_utilisateur_employe_infos_directeur').initDataTables({{ datatable_settings(datatable) }}, {
+              $('#grid_app_utilisateur_employe_infos').initDataTables({{ datatable_settings(datatable) }}, {
                   searching: true,
-                  ajaxUrl: "{{ path('app_utilisateur_employe_infos_directeur_index') }}",
+                  ajaxUrl: "{{ path('app_utilisateur_employe_infos_index',{'entreprise':entreprise}) }}",
                   language: {
                       url: asset_base_path + "/js/i18n/French.json"
                   }

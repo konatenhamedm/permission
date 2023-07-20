@@ -2,9 +2,11 @@
     <div class="col-xl-3 col-12">
         <ul class="nav flex-column nav-pills  sw-nav-tabs-vertical" id="subParamLinksTab">
             {% for key, _parametre in links %}
+         
                  <li class="nav-item">
                     <a class="nav-link {% if key == 0 %}active{% endif %}" data-bs-toggle="tab"
                         href="#{{ _parametre.id }}" data-href="{{ _parametre.href }}">
+                      
                         {% if _parametre.affiche_total !="false" %}
                         
                          <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreDemande(_parametre.etat,_parametre.label)  }}</span></span>&nbsp;

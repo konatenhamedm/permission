@@ -38,7 +38,7 @@ class InformationsEmployeController extends BaseController
     {
         $groupeName = $this->security->getUser()->getGroupe()->getName();
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-
+//dd($permission);
         $table = $dataTableFactory->create()
         ->add('matricule', TextColumn::class, ['label' => 'Matricule'])
         ->add('civilite', TextColumn::class, ['field' => 'civilite.code', 'label' => 'Civilité'])
@@ -188,7 +188,7 @@ class InformationsEmployeController extends BaseController
     {
         $groupeName = $this->security->getUser()->getGroupe()->getName();
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-
+//dd($permission);
         $table = $dataTableFactory->create()
             ->add('matricule', TextColumn::class, ['label' => 'Matricule'])
             ->add('civilite', TextColumn::class, ['field' => 'civilite.code', 'label' => 'Civilité'])
