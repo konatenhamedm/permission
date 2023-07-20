@@ -169,7 +169,7 @@ class InformationsEmployeController extends BaseController
         return $this->render('directeur/demande/infos/index_president.html.twig', [
                     'datatable' => $table,
                     'permition' => $permission,
-                    'entreprise'=>$entreprise,
+                   'entreprise'=>$entreprise,
                    
                 ]);
        }else{
@@ -210,7 +210,8 @@ class InformationsEmployeController extends BaseController
                     if($this->security->getUser()->getGroupe()->getName() != "Présidents"){
                         $qb->andWhere('entreprise.code = :entreprise')
                             ->setParameter('entreprise',$this->security->getUser()->getEmploye()->getEntreprise()->getCode());
-                    }
+                   
+                        }
 
                 }
             ])
@@ -316,7 +317,7 @@ class InformationsEmployeController extends BaseController
             return $this->render('directeur/demande/infos/index_president.html.twig', [
                 'datatable' => $table,
                 'permition' => $permission,
-                'entreprise'=>$entreprise,
+                //'entreprise'=>$entreprise,
 
             ]);
         }else{
