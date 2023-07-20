@@ -32,6 +32,18 @@ class DemandeBrouillon
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateCreation = null;
+
+    #[ORM\Column(type: Types::TEXT,nullable:true)]
+    private ?string $motif_rejet_directeur = null;
+
+    #[ORM\Column(type: Types::TEXT,nullable:true)]
+    private ?string $motif_rejet_president = null;
+
+    #[ORM\Column(type: Types::TEXT,nullable:true)]
+    private ?string $motif_valider_president = null;
+
+    #[ORM\ManyToOne(inversedBy: 'demandeBrouillons')]
+    private ?Demande $demande = null;
     
         public function __construct()
         {
@@ -111,6 +123,54 @@ class DemandeBrouillon
     public function setDateCreation(\DateTimeInterface $dateCreation): static
     {
         $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    public function getMotifRejetDirecteur(): ?string
+    {
+        return $this->motif_rejet_directeur;
+    }
+
+    public function setMotifRejetDirecteur(string $motif_rejet_directeur): static
+    {
+        $this->motif_rejet_directeur = $motif_rejet_directeur;
+
+        return $this;
+    }
+
+    public function getMotifRejetPresident(): ?string
+    {
+        return $this->motif_rejet_president;
+    }
+
+    public function setMotifRejetPresident(string $motif_rejet_president): static
+    {
+        $this->motif_rejet_president = $motif_rejet_president;
+
+        return $this;
+    }
+
+    public function getMotifValiderPresident(): ?string
+    {
+        return $this->motif_valider_president;
+    }
+
+    public function setMotifValiderPresident(string $motif_valider_president): static
+    {
+        $this->motif_valider_president = $motif_valider_president;
+
+        return $this;
+    }
+
+    public function getDemande(): ?Demande
+    {
+        return $this->demande;
+    }
+
+    public function setDemande(?Demande $demande): static
+    {
+        $this->demande = $demande;
 
         return $this;
     }

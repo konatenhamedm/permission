@@ -2,6 +2,7 @@
 
 namespace App\Controller\Configuration;
 
+use App\Controller\BaseController;
 use App\Service\Breadcrumb;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,15 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('config/demande')]
-class DemandeConfigController extends AbstractController
+class DemandeConfigController extends BaseController
 {
     private const MODULE_NAME = 'directeur';
+    const INDEX_ROOT_NAME="app_config_demande_index";
 
 
     #[Route(path: '/', name: 'app_config_demande_index', methods: ['GET', 'POST'])]
     public function index(Request $request, Breadcrumb $breadcrumb): Response
     {
-    
+        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
+      
         $modules = [
             [
                 'label' => "Attente directeur",
@@ -85,7 +88,8 @@ class DemandeConfigController extends AbstractController
         return $this->render('directeur/config/index.html.twig', [
             'modules' => $modules,
             'module_name' => self::MODULE_NAME,
-            'breadcrumb' => $breadcrumb
+            'breadcrumb' => $breadcrumb,
+            "permition"=>$permission
         ]);
     }
 

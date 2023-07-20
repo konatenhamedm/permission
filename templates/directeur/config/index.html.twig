@@ -59,6 +59,7 @@
   </style>
 {% endblock %}
 {% block body %}
+{% if permition != null %}
   <div class="card card-tabs card-custom card-sticky">
     <div class="card-header card-header-stretch card-header-custom">
       <div class="card-toolbar">
@@ -82,13 +83,13 @@
         </ul>
         
       </div>
-       <div style="margin-top: 8px;">
+      {#  <div style="margin-top: 8px;">
                 <a title="Ajouter une demane ici" href="{{ path('app_demande_demande_new') }}" class="btn btn-main btn-sm"
                    data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
                     <i class="bi bi-plus-square text-light"></i>
                     Nouveau
                 </a>
-            </div>
+            </div> #}
     </div>
     <div class="card-body">
       <div class="tab-content" id="myTabContent">
@@ -100,6 +101,11 @@
       </div>
     </div>
   </div>
+
+  {% else %}
+    {% include '_includes/page_error.html.twig' %}
+
+  {% endif %}
 
 {% endblock %}
 

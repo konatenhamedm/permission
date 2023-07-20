@@ -7,12 +7,12 @@
        {% if (app.user.groupe.name != "Super Administrateur") %}
             {% if(config|length == 0 ) %}
                 {% if permition in ["CR","CRU","CRUD"] %}
-
-                {% endif %} <a href="{{ path('app_parametre_config_app_new') }}" class="btn btn-main btn-sm"
+                <a href="{{ path('app_parametre_config_app_new') }}" class="btn btn-main btn-sm"
                                data-bs-toggle="modal" data-bs-target="#exampleModalSizeLg2">
                 <i class="bi bi-plus-square text-light"></i>
                 Nouveau
             </a>
+                {% endif %} 
             {% endif %}
             {% else %}
                 {% if permition in ["CR","CRU","CRUD"] %}

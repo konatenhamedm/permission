@@ -9,26 +9,15 @@
         <h3 class="card-title"> {{ titre}}</h3>
         <div class="card-toolbar">
              {% if permition in ["CR","CRU","CRUD"] %}
-                 <a href="/demande/demande/new" class="btn-main btn btn-xs btn-clean btn-icon mr-2 " data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
-                     <span class="svg-icon svg-icon-md"><i class=" bi bi-pen"></i></span>
-                 </a>
-                 <a title="Ajouter une demane ici" href="{{ path('app_demande_demande_edit',{'id':7}) }}" class="btn btn-main btn-sm"
-                    data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
-                     <i class="bi bi-plus-square text-light"></i>
-                     Nouveau
-                 </a>
-
-                 <a title="Ajouter une demane ici" href="{{ path('app_demande_demande_newuuuuu') }}" class="btn btn-main btn-sm"
-                 data-bs-toggle="modal" data-bs-target="#exampleModalSizeLg2">
-                  <i class="bi bi-plus-square text-light"></i>
-                  Nouveaussds
-              </a>
-
-              <a href="{{ path('app_demande_demande_newuuuuu') }}" class="btn btn-main btn-sm"
-                               data-bs-toggle="modal" data-bs-target="#exampleModalSizeLg2">
+                
+             {% if type =='demande' %}
+             <a href="{{ path('app_demande_demande_new') }}" class="btn btn-main btn-sm"
+                               data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
                 <i class="bi bi-plus-square text-light"></i>
                 Nouveau
             </a>
+            {% endif %}
+             
             {% endif %}
         </div>
     </div>

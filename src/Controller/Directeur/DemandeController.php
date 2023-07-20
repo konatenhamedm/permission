@@ -29,9 +29,11 @@ class DemandeController extends BaseController
 
     #[Route('/{etat}/avis', name: 'app_directeur_demande_index', methods: ['GET', 'POST'])]
     public function index(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
-    {  if ($etat == 'demande_initie') {
+    {  
+        
+        if ($etat == 'demande_initie') {
 
-        $titre ="Demandes initiées";
+        $titre ="Demandes en attente approbation directeur";
     }elseif($etat == 'demande_valider_directeur') {
 
         $titre ="Demandes en attente d'approbation du président";
@@ -268,6 +270,7 @@ class DemandeController extends BaseController
             'etat' => $etat,
             'titre' => $titre,
             'permition' => $permission,
+            'type'=>"avis"
         ]);
     }
 
@@ -513,6 +516,7 @@ class DemandeController extends BaseController
             'etat' => $etat,
             'titre' => $titre,
             'permition' => $permission,
+            'type'=>"demande"
         ]);
     }
 

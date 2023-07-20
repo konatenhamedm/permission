@@ -3,10 +3,8 @@
 namespace App\Controller\Demande;
 
 use App\Controller\BaseController;
-use App\Controller\FileTrait;
 use App\Entity\Demande;
 use App\Entity\Motif;
-use App\Entity\Utilisateur;
 use App\Form\DemandeType;
 use App\Form\DemandeWorkflowType;
 use App\Repository\AvisRepository;
@@ -17,24 +15,20 @@ use App\Repository\MotifRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Workflow\Registry;
 
 
-#[Route('/demande/demande')]
-class DemandeController extends BaseController
+#[Route('/demande/demande/simple')]
+class DemandeSimpleController extends BaseController
 {
 
  
@@ -437,170 +431,6 @@ class DemandeController extends BaseController
     }
 
     
-    #[Route('/new', name: 'app_demande_demande_new', methods: ['GET', 'POST'])]
-    public function newdd(Request $request, DemandeRepository $demandeRepository,ElementMotifRepository $elementRepository,AvisRepository $avisRepository, FormError $formError): Response
-    {
-
-        //dd("ee");
-        $demande = new Demande();
-        $date = new DateTime();
-        $rest = $date->modify('+1 day');
-
-        $motif = new Motif();
-        $motif->setElement($elementRepository->find("MOT1"));
-        $demande->addMotif($motif);
-
-        $demande->setDateDebut($rest);
-        $form = $this->createForm(DemandeType::class, $demande, [
-            'method' => 'POST',
-            'doc_options' => [
-                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
-                'attrs' => ['class' => 'filestyle'],
-            ],
-            'action' => $this->generateUrl('app_demande_demande_new')
-        ]);
-
-        $form->handleRequest($request);
-
-        $data = null;
-        $statutCode = Response::HTTP_OK;
-
-        $isAjax = $request->isXmlHttpRequest();
-
-
-        if ($form->isSubmitted()) {
-            $response = [];
-            $redirect = $this->generateUrl('app_demande_demande_index');
-          
-
-
-            if ($form->isValid()) {
-                $demande->setDateCreation(new \DateTime());
-                if($this->security->getUser()->getGroupe()->getName() == "Directeurs"){
-                    $demande->setEtat("demande_valider_directeur");
-                    $demande->setAvis($avisRepository->findOneBy(array('code'=>'AV1')));
-                    $demande->setJustificationDirecteur('Demande permission directeur');
-                }else{
-                     $demande->setEtat("demande_initie");
-                }
-               
-                
-                $demandeRepository->save($demande, true);
-                $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
-                $this->addFlash('success', $message);
-
-
-            } else {
-                $message = $formError->all($form);
-                $statut = 0;
-                $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-                if (!$isAjax) {
-                  $this->addFlash('warning', $message);
-                }
-
-            }
-
-
-            if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
-            } else {
-                if ($statut == 1) {
-                    return $this->redirect($redirect, Response::HTTP_OK);
-                }
-            }
-
-
-        }
-
-        return $this->renderForm('demande/demande/new.html.twig', [
-            'demande' => $demande,
-            'form' => $form,
-        ]);
-    }
-    #[Route('/new', name: 'app_demande_demande_newuuuuu', methods: ['GET', 'POST'])]
-    public function new(Request $request, DemandeRepository $demandeRepository,ElementMotifRepository $elementRepository,AvisRepository $avisRepository, FormError $formError): Response
-    {
-
-        //dd("ee");
-        $demande = new Demande();
-        $date = new DateTime();
-        $rest = $date->modify('+1 day');
-
-        $motif = new Motif();
-        $motif->setElement($elementRepository->find("MOT1"));
-        $demande->addMotif($motif);
-
-        $demande->setDateDebut($rest);
-        $form = $this->createForm(DemandeType::class, $demande, [
-            'method' => 'POST',
-            'doc_options' => [
-                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
-                'attrs' => ['class' => 'filestyle'],
-            ],
-            'action' => $this->generateUrl('app_demande_demande_newuuuuu')
-        ]);
-
-        $form->handleRequest($request);
-
-        $data = null;
-        $statutCode = Response::HTTP_OK;
-
-        $isAjax = $request->isXmlHttpRequest();
-
-
-        if ($form->isSubmitted()) {
-            $response = [];
-            $redirect = $this->generateUrl('app_demande_demande_index');
-          
-
-
-            if ($form->isValid()) {
-                $demande->setDateCreation(new \DateTime());
-                if($this->security->getUser()->getGroupe()->getName() == "Directeurs"){
-                    $demande->setEtat("demande_valider_directeur");
-                    $demande->setAvis($avisRepository->findOneBy(array('code'=>'AV1')));
-                    $demande->setJustificationDirecteur('Demande permission directeur');
-                }else{
-                     $demande->setEtat("demande_initie");
-                }
-               
-                
-                $demandeRepository->save($demande, true);
-                $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
-                $this->addFlash('success', $message);
-
-
-            } else {
-                $message = $formError->all($form);
-                $statut = 0;
-                $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-                if (!$isAjax) {
-                  $this->addFlash('warning', $message);
-                }
-
-            }
-
-
-            if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
-            } else {
-                if ($statut == 1) {
-                    return $this->redirect($redirect, Response::HTTP_OK);
-                }
-            }
-
-
-        }
-
-        return $this->renderForm('demande/demande/new.html.twig', [
-            'demande' => $demande,
-            'form' => $form,
-        ]);
-    }
     #[Route('/{id}/show', name: 'app_demande_demande_show', methods: ['GET'])]
     public function show(Request $request,Demande $demande): Response
     {

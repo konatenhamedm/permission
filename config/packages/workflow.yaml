@@ -73,6 +73,9 @@ framework:
         rejeter_president:
           from: brouillon_review_president
           to: brouillon_rejeter
+        valider_president:
+          from: brouillon_review_president
+          to: brouillon_valider  
         
 
           

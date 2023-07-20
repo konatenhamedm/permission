@@ -2,6 +2,7 @@
 
 namespace App\Controller\Configuration;
 
+use App\Controller\BaseController;
 use App\Service\Breadcrumb;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,14 +10,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('config/brouillon/directeur')]
-class BrouillonDirecteurController extends AbstractController
+class BrouillonDirecteurController extends BaseController
 {
     private const MODULE_NAME = 'directeur';
-
+const INDEX_ROOT_NAME ="app_config_brouillon_directeur_index";
 
     #[Route(path: '/', name: 'app_config_brouillon_directeur_index', methods: ['GET', 'POST'])]
     public function index(Request $request, Breadcrumb $breadcrumb): Response
     {
+        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
       
         $modules = [
             [
@@ -67,7 +69,8 @@ class BrouillonDirecteurController extends AbstractController
         return $this->render('directeur/brouillon/index.html.twig', [
             'modules' => $modules,
             'module_name' => self::MODULE_NAME,
-            'breadcrumb' => $breadcrumb
+            'breadcrumb' => $breadcrumb,
+            "permition"=>$permission
         ]);
     }
 

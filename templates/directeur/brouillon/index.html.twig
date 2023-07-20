@@ -74,8 +74,16 @@
                   {{ module.label }}
                 </span>&nbsp;
                {% set entreprise = app.user.employe.entreprise.denomination %}
-                <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreBroullionStat(module.etat,entreprise)  }}</span></span>
+               {% set groupe = app.user.groupe.name %}
+               {% if groupe == "Directeurs" %}
+              <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreBroullionStat(module.etat,entreprise)  }}</span></span>
 
+              {% else %}
+            <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreBroullionStat(module.etat,null)  }}</span></span>
+
+              {% endif %}
+               
+                
               </a>
             </li>
           {% endfor %}

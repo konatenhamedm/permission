@@ -17,7 +17,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\BaseController;
+use App\Entity\Demande;
+use App\Entity\Motif;
+use App\Form\DemandeBrouillonFormAlerteType;
+use App\Repository\DemandeRepository;
+use App\Repository\ElementMotifRepository;
+use App\Repository\MotifRepository;
+use App\Repository\UtilisateurRepository;
+use DateTime;
 use Doctrine\ORM\QueryBuilder;
+use LogicException;
 
 #[Route('/directeur/demande/brouillon')]
 class DemandeBrouillonController extends BaseController
@@ -28,13 +37,15 @@ class DemandeBrouillonController extends BaseController
     public function index(Request $request,string $etat, DataTableFactory $dataTableFactory): Response
     {
 
-
+        $groupe = $this->groupe;
+       
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), self::INDEX_ROOT_NAME);
-
+ //dd($permission);
         $table = $dataTableFactory->create()
-            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut'])
-            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin'])
+            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut' ,'format' => 'd-m-Y'])
+            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin' ,'format' => 'd-m-Y'])
             ->add('nom', TextColumn::class, ['label' => 'Utilisateur', 'field' => 'e.getNomComplet'])
+            ->add('entreprise', TextColumn::class, ['label' => 'Entreprise', 'field' => 'en.denomination'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => DemandeBrouillon::class,
                 'query' => function(QueryBuilder $qb)  use ($etat) {
@@ -45,10 +56,15 @@ class DemandeBrouillonController extends BaseController
                         ->join('e.entreprise', 'en')
                         ->orderBy('d.dateCreation','ASC')
                         ->join('e.fonction', 'f') 
-                        ->andWhere('e.entreprise =:entreprise')
                         ->andWhere('d.etat =:etat')
-                        ->setParameter('entreprise',$this->security->getUser()->getEmploye()->getEntreprise())
-                        ->setParameter('etat',$etat);
+                        ->setParameter('etat',$etat)
+                       ;
+
+                        if($this->groupe =="Directeur"){
+                            $qb->andWhere('e.entreprise =:entreprise')
+                            ->setParameter('entreprise',$this->security->getUser()->getEmploye()->getEntreprise());
+                        
+                        }
                     
                     }
                 
@@ -57,21 +73,19 @@ class DemandeBrouillonController extends BaseController
         if ($permission != null) {
 
             $renders = [
-                'edit' =>  new ActionRender(function () use ($permission) {
+                'edit' =>  new ActionRender(function () use ($permission,$groupe,$etat) {
                     if ($permission == 'R') {
                         return false;
                     } elseif ($permission == 'RD') {
                         return false;
-                    } elseif ($permission == 'RU') {
+                    } elseif ($permission == 'RU' && ($groupe == "Directeurs") && ($etat =="brouillon_initie" )) {
                         return true;
-                    } elseif ($permission == 'RUD') {
+                    } elseif (($permission == 'CRUD') && ($groupe == "Directeurs") && ($etat =="brouillon_initie" )) {
                         return true;
-                    } elseif ($permission == 'CRU') {
+                    } elseif ($permission == 'CRU' && ($groupe == "Directeurs") && ($etat =="brouillon_initie" )) {
                         return true;
                     } elseif ($permission == 'CR') {
                         return false;
-                    } else {
-                        return true;
                     }
                 }),
                 'delete' => new ActionRender(function () use ($permission) {
@@ -81,15 +95,13 @@ class DemandeBrouillonController extends BaseController
                         return true;
                     } elseif ($permission == 'RU') {
                         return false;
-                    } elseif ($permission == 'RUD') {
+                    } elseif ($permission == 'CRUD') {
                         return true;
                     } elseif ($permission == 'CRU') {
                         return false;
                     } elseif ($permission == 'CR') {
                         return false;
-                    } else {
-                        return true;
-                    }
+                    } 
                 }),
                 'show' => new ActionRender(function () use ($permission) {
                     if ($permission == 'R') {
@@ -98,16 +110,29 @@ class DemandeBrouillonController extends BaseController
                         return true;
                     } elseif ($permission == 'RU') {
                         return true;
-                    } elseif ($permission == 'RUD') {
+                    } elseif ($permission == 'CRUD') {
                         return true;
                     } elseif ($permission == 'CRU') {
                         return true;
                     } elseif ($permission == 'CR') {
                         return true;
-                    } else {
+                    } 
+                }),
+                
+                'edit_president' =>  new ActionRender(function () use ($permission,$groupe,$etat) {
+                    if ($permission == 'R') {
+                        return false;
+                    } elseif ($permission == 'RD') {
+                        return false;
+                    } elseif ($permission == 'RU' && ($groupe !="Directeurs") && ($etat =="brouillon_review_president")) {
                         return true;
+                    } elseif (($permission == 'CRUD') && ($groupe !="Directeurs") && ($etat =="brouillon_review_president")) {
+                        return true;
+                    } elseif ($permission == 'CRU' && ($groupe !="Directeurs") && ($etat =="brouillon_review_president")) {
+                        return true;
+                    } elseif ($permission == 'CR') {
+                        return false;
                     }
-                    return true;
                 }),
 
             ];
@@ -132,6 +157,9 @@ class DemandeBrouillonController extends BaseController
                             'actions' => [
                                 'edit' => [
                                     'url' => $this->generateUrl('app_directeur_demande_brouillon_edit', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-default'], 'render' => $renders['edit']
+                                ],
+                                'edit_president' => [
+                                    'url' => $this->generateUrl('app_directeur_demande_brouillon_edit_president', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-default'], 'render' => $renders['edit_president']
                                 ],
                                 'show' => [
                                     'url' => $this->generateUrl('app_directeur_demande_brouillon_show', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-eye', 'attrs' => ['class' => 'btn-primary'], 'render' => $renders['show']
@@ -163,58 +191,7 @@ class DemandeBrouillonController extends BaseController
         ]);
     }
 
-    #[Route('/new', name: 'app_directeur_demande_brouillon_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, DemandeBrouillonRepository $demandeBrouillonRepository, FormError $formError): Response
-    {
-        $demandeBrouillon = new DemandeBrouillon();
-        $form = $this->createForm(DemandeBrouillonType::class, $demandeBrouillon, [
-            'method' => 'POST',
-            'action' => $this->generateUrl('app_directeur_demande_brouillon_new')
-        ]);
-        $form->handleRequest($request);
-
-        $data = null;
-        $statutCode = Response::HTTP_OK;
-
-        $isAjax = $request->isXmlHttpRequest();
-
-        if ($form->isSubmitted()) {
-            $response = [];
-           // $redirect = $this->generateUrl('app_directeur_demande_brouillon_index');
-
-
-            if ($form->isValid()) {
-
-                $demandeBrouillon->setEtat('brouillon_initie');
-                $demandeBrouillonRepository->save($demandeBrouillon, true);
-                $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
-                $this->addFlash('success', $message);
-            } else {
-                $message = $formError->all($form);
-                $statut = 0;
-                $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-                if (!$isAjax) {
-                    $this->addFlash('warning', $message);
-                }
-            }
-
-
-            if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
-            } else {
-                if ($statut == 1) {
-                    return null;
-                }
-            }
-        }
-
-        return $this->renderForm('directeur/demande_brouillon/new.html.twig', [
-            'demande_brouillon' => $demandeBrouillon,
-            'form' => $form,
-        ]);
-    }
+    
 
     #[Route('/{id}/show', name: 'app_directeur_demande_brouillon_show', methods: ['GET'])]
     public function show(DemandeBrouillon $demandeBrouillon): Response
@@ -225,9 +202,9 @@ class DemandeBrouillonController extends BaseController
     }
 
     #[Route('/{id}/edit', name: 'app_directeur_demande_brouillon_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, DemandeBrouillon $demandeBrouillon, DemandeBrouillonRepository $demandeBrouillonRepository, FormError $formError): Response
+    public function edit(Request $request, DemandeBrouillon $demandeBrouillon,ElementMotifRepository $elementMotifRepository,DemandeRepository $demandeRepository,UtilisateurRepository $utilisateurRepository,MotifRepository $motifRepository, DemandeBrouillonRepository $demandeBrouillonRepository, FormError $formError): Response
     {
-
+        $groupe = $this->groupe;
         $form = $this->createForm(DemandeBrouillonType::class, $demandeBrouillon, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_directeur_demande_brouillon_edit', [
@@ -245,12 +222,112 @@ class DemandeBrouillonController extends BaseController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_directeur_demande_brouillon_index');
+            $redirect = $this->generateUrl('app_config_brouillon_directeur_index');
+            $workflow = $this->workflow->get($demandeBrouillon, 'demandeBrouillon');
 
+            $date1 = $form->get('dateDebut')->getData(); //date fr le 01 mai 2010
+            $date2 = $form->get('dateFin')->getData(); // date fr le 01 octobre 2010
+            // On transforme les 2 dates en timestamp
 
+           // dd( );
+            $date3 = strtotime($date1->format('Y-m-d'));
+            $date4 = strtotime( $date2->format('Y-m-d'));
+            
+            // On récupère la différence de timestamp entre les 2 précédents
+            $nbJoursTimestamp = $date4 - $date3;
+            
+            // ** Pour convertir le timestamp (exprimé en secondes) en jours **
+            // On sait que 1 heure = 60 secondes * 60 minutes et que 1 jour = 24 heures donc :
+            $nbJours = $nbJoursTimestamp/86400; // 86 400 = 60*60*24
+            
+           
             if ($form->isValid()) {
+                if ($form->getClickedButton()->getName() === 'valider_president'){
+                    try {
 
-                $demandeBrouillonRepository->save($demandeBrouillon, true);
+                        if ($workflow->can($demandeBrouillon,'valider_president')){
+                            $workflow->apply($demandeBrouillon, 'valider_president');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+
+                    $demande = new Demande();
+                    $demande->setType("TYPE_JOURNEE")
+                            ->setDateCreation(new DateTime())
+                            ->setDateDebut($form->get('dateDebut')->getData())
+                            ->setDateFin($form->get('dateFin')->getData())
+                            ->setUtilisateur($utilisateurRepository->find($form->get('utilisateur')->getData()))
+                            ->setEtat("demande_valider")
+                            ->setNbreJour($nbJours)
+                            ->setJustificationDirecteur("RAS")
+                            ->setJustificationPresident("RAS")
+                            ->setNbreJour($nbJours);
+
+                            $demandeRepository->save($demande,true);
+
+                     $motif = new Motif();
+                     $motif->setDemande($demande) ;      
+                     $motif->setDateCreation(new DateTime())  ;  
+                     $motif->setElement($elementMotifRepository->findOneBy(array('code'=>'MOT3')))  ;     
+                     $motif->setPrecisez($form->get('motif')->getData())  ;     
+                     $motifRepository->save($motif,true);
+                     $demandeBrouillon->setDemande($demande);
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                if ($form->getClickedButton()->getName() === 'valider'){
+                    try {
+
+                        if ($workflow->can($demandeBrouillon,'passer')){
+                            $workflow->apply($demandeBrouillon, 'passer');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+
+                    $demande = new Demande();
+                    $demande->setType("TYPE_JOURNEE")
+                            ->setDateCreation(new DateTime())
+                            ->setDateDebut($form->get('dateDebut')->getData())
+                            ->setDateFin($form->get('dateFin')->getData())
+                            ->setUtilisateur($utilisateurRepository->find($form->get('utilisateur')->getData()))
+                            ->setEtat("demande_valider")
+                            ->setNbreJour($nbJours)
+                            ->setJustificationDirecteur("RAS")
+                            ->setJustificationPresident("RAS")
+                            ->setNbreJour($nbJours);
+
+                            $demandeRepository->save($demande,true);
+
+                     $motif = new Motif();
+                     $motif->setDemande($demande) ;      
+                     $motif->setDateCreation(new DateTime())  ;  
+                     $motif->setElement($elementMotifRepository->findOneBy(array('code'=>'MOT3')))  ;     
+                     $motif->setPrecisez($form->get('motif')->getData())  ;     
+                     $motifRepository->save($motif,true);
+                     $demandeBrouillon->setDemande($demande);
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }elseif($form->getClickedButton()->getName() === 'review_president'){
+                    try {
+
+                        if ($workflow->can($demandeBrouillon,'review_president')){
+                            $workflow->apply($demandeBrouillon, 'review_president');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                else{
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
@@ -277,6 +354,215 @@ class DemandeBrouillonController extends BaseController
         return $this->renderForm('directeur/demande_brouillon/edit.html.twig', [
             'demande_brouillon' => $demandeBrouillon,
             'form' => $form,
+            'groupe'=>$groupe 
+        ]);
+    }
+
+
+    #[Route('/{id}/edit/rejeter', name: 'app_directeur_demande_brouillon_edit_rejeter', methods: ['GET', 'POST'])]
+    public function editRejeter(Request $request, DemandeBrouillon $demandeBrouillon,ElementMotifRepository $elementMotifRepository,DemandeRepository $demandeRepository,UtilisateurRepository $utilisateurRepository,MotifRepository $motifRepository, DemandeBrouillonRepository $demandeBrouillonRepository, FormError $formError): Response
+    {
+        $groupe = $this->groupe;
+        $form = $this->createForm(DemandeBrouillonFormAlerteType::class, $demandeBrouillon, [
+            'method' => 'POST',
+            'action' => $this->generateUrl('app_directeur_demande_brouillon_edit_rejeter', [
+                'id' =>  $demandeBrouillon->getId()
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_config_brouillon_directeur_index');
+            $workflow = $this->workflow->get($demandeBrouillon, 'demandeBrouillon');
+
+            if ($form->isValid()) {
+                if ($form->getClickedButton()->getName() === 'rejeter'){
+                    try {
+
+                        if ($workflow->can($demandeBrouillon,'rejeter_directeur')){
+                            $workflow->apply($demandeBrouillon, 'rejeter_directeur');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }elseif($form->getClickedButton()->getName() === 'rejeter_president'){
+                    try {
+
+                        if ($workflow->can($demandeBrouillon,'rejeter_president')){
+                            $workflow->apply($demandeBrouillon, 'rejeter_president');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                else{
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                
+                $data = true;
+                $message       = 'Opération effectuée avec succès';
+                $statut = 1;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->renderForm('directeur/demande_brouillon/annuler.html.twig', [
+            'demande_brouillon' => $demandeBrouillon,
+            'form' => $form,
+            'groupe'=>$groupe 
+        ]);
+    }
+
+    #[Route('/{id}/edit/president', name: 'app_directeur_demande_brouillon_edit_president', methods: ['GET', 'POST'])]
+    public function editPresident(Request $request, DemandeBrouillon $demandeBrouillon,ElementMotifRepository $elementMotifRepository,DemandeRepository $demandeRepository,UtilisateurRepository $utilisateurRepository,MotifRepository $motifRepository, DemandeBrouillonRepository $demandeBrouillonRepository, FormError $formError): Response
+    {
+        $groupe = $this->getUser()->getGroupe()->getName();
+        $form = $this->createForm(DemandeBrouillonType::class, $demandeBrouillon, [
+            'method' => 'POST',
+            'action' => $this->generateUrl('app_directeur_demande_brouillon_edit', [
+                'id' =>  $demandeBrouillon->getId()
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_config_brouillon_directeur_index');
+            $workflow = $this->workflow->get($demandeBrouillon, 'demandeBrouillon');
+
+            $date1 = $form->get('dateDebut')->getData(); //date fr le 01 mai 2010
+            $date2 = $form->get('dateFin')->getData(); // date fr le 01 octobre 2010
+            // On transforme les 2 dates en timestamp
+
+           // dd( );
+            $date3 = strtotime($date1->format('Y-m-d'));
+            $date4 = strtotime( $date2->format('Y-m-d'));
+            
+            // On récupère la différence de timestamp entre les 2 précédents
+            $nbJoursTimestamp = $date4 - $date3;
+            
+            // ** Pour convertir le timestamp (exprimé en secondes) en jours **
+            // On sait que 1 heure = 60 secondes * 60 minutes et que 1 jour = 24 heures donc :
+            $nbJours = $nbJoursTimestamp/86400; // 86 400 = 60*60*24
+            
+           
+            if ($form->isValid()) {
+                if ($form->getClickedButton()->getName() === 'valider'){
+                    try {
+
+                        if ($workflow->can($demandeBrouillon,'passer')){
+                            $workflow->apply($demandeBrouillon, 'passer');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+
+                    $demande = new Demande();
+                    $demande->setType("TYPE_JOURNEE")
+                            ->setDateCreation(new DateTime())
+                            ->setDateDebut($form->get('dateDebut')->getData())
+                            ->setDateFin($form->get('dateFin')->getData())
+                            ->setUtilisateur($utilisateurRepository->find($form->get('utilisateur')->getData()))
+                            ->setEtat("demande_valider")
+                            ->setNbreJour($nbJours)
+                            ->setJustificationDirecteur("RAS")
+                            ->setJustificationPresident("RAS")
+                            ->setNbreJour($nbJours);
+
+                            $demandeRepository->save($demande,true);
+
+                     $motif = new Motif();
+                     $motif->setDemande($demande) ;      
+                     $motif->setDateCreation(new DateTime())  ;  
+                     $motif->setElement($elementMotifRepository->findOneBy(array('code'=>'MOT3')))  ;     
+                     $motif->setPrecisez($form->get('motif')->getData())  ;     
+                     $motifRepository->save($motif,true);
+                     $demandeBrouillon->setDemande($demande);
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }elseif($form->getClickedButton()->getName() === 'review_president'){
+                    try {
+
+                        if ($workflow->can($demandeBrouillon,'review_president')){
+                            $workflow->apply($demandeBrouillon, 'review_president');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                else{
+                    $demandeBrouillonRepository->save($demandeBrouillon, true);
+                }
+                
+                $data = true;
+                $message       = 'Opération effectuée avec succès';
+                $statut = 1;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->renderForm('directeur/demande_brouillon/edit.html.twig', [
+            'demande_brouillon' => $demandeBrouillon,
+            'form' => $form,
+            'groupe'=>$groupe 
         ]);
     }
 

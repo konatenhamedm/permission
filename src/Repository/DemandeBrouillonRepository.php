@@ -40,17 +40,29 @@ class DemandeBrouillonRepository extends ServiceEntityRepository
     }
 
     public function nombreBroullionStat($etat,$entreprise){
+       if($entreprise != null){
         return $this->createQueryBuilder('d')
-                ->select("count(d.id)")
-                ->join('d.utilisateur','u')
-                ->join('u.employe','e')
-                ->join('e.entreprise','en')
-                ->andWhere('d.etat =:etat')
-                ->andWhere('en.denomination =:entreprise')
-                ->setParameter('entreprise',$entreprise)
-                ->setParameter('etat',$etat)
-                ->getQuery()
-                  ->getSingleScalarResult();
+        ->select("count(d.id)")
+        ->join('d.utilisateur','u')
+        ->join('u.employe','e')
+        ->join('e.entreprise','en')
+        ->andWhere('d.etat =:etat')
+        ->andWhere('en.denomination =:entreprise')
+        ->setParameter('entreprise',$entreprise)
+        ->setParameter('etat',$etat)
+        ->getQuery()
+          ->getSingleScalarResult();
+       }else{
+        return $this->createQueryBuilder('d')
+        ->select("count(d.id)")
+        ->join('d.utilisateur','u')
+        ->join('u.employe','e')
+        ->join('e.entreprise','en')
+        ->andWhere('d.etat =:etat')
+        ->setParameter('etat',$etat)
+        ->getQuery()
+          ->getSingleScalarResult();
+       }
     }
 
 

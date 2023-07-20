@@ -3,6 +3,8 @@ function load_tab(tabId = null, data_options = null, tabIndex = -1, tabHash = nu
         tabId = $('[data-loadable]').attr('id');
     }
     const active_link_class = 'active-li';
+    data_options = data_options || {};
+   
 
     if ($(`#${tabId}`).length == 0) {
         alert('L\'élément avec l\'ID '+ tabId + ' n\'existe pas');
@@ -62,11 +64,18 @@ function load_tab(tabId = null, data_options = null, tabIndex = -1, tabHash = nu
    
     const url = localStorage.getItem(urlKey);
 
-    if (tabIndex >= 0 || (hash && $('[href="#'+ hash +'"]').length && (hash_url || $('[href="#'+ hash +'"]').data('href') == url))) {
+    if (data_options.id || tabIndex >= 0 || (hash && $('[href="#'+ hash +'"]').length && (hash_url || $('[href="#'+ hash +'"]').data('href') == url))) {
         const $active_tab_link = $('[href="#'+ hash +'"]');
-        if (tabIndex >= 0 || tabHash) {
+       
+        if (tabIndex >= 0 || tabHash || data_options.id) {
             let active_url, $active_tab_link, hash;
-            if (tabIndex >= 0) {
+            if (data_options.id) {
+                
+                $(`#${tabId} ${data_options.id} a`).tab('show'); // Select third tab (0-indexed)
+                $active_tab_link = $(`#${tabId} a.active`);
+                [, hash] = $active_tab_link.attr('href').split('#');
+                active_url = $active_tab_link.data('href');
+            } else if (tabIndex >= 0) {
                 $(`#${tabId} li:eq(${tabIndex}) a`).tab('show'); // Select third tab (0-indexed)
                 $active_tab_link = $(`#${tabId} a.active`);
                 [, hash] = $active_tab_link.attr('href').split('#');

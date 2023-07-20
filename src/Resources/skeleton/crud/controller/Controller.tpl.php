@@ -9,6 +9,7 @@ use App\Controller\BaseController;
 class <?= $class_name ?> extends BaseController
 {
     const INDEX_ROOT_NAME = '<?= $route_name ?>'.'_index';
+    
 <?= $generator->generateRouteForControllerMethod('/', sprintf('%s_index', $route_name), ['GET', 'POST']) ?>
 <?php if (isset($repository_full_class_name)): ?>
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
@@ -35,13 +36,11 @@ class <?= $class_name ?> extends BaseController
         return true;
         }elseif($permission == 'RUD'){
         return true;
-        }elseif($permission == 'CRU'){
+        }elseif($permission == 'CRUD'){
         return true;
         }
         elseif($permission == 'CR'){
         return false;
-        }else{
-        return true;
         }
 
         }),
@@ -54,14 +53,13 @@ class <?= $class_name ?> extends BaseController
         return false;
         }elseif($permission == 'RUD'){
         return true;
-        }elseif($permission == 'CRU'){
+        }elseif($permission == 'CRUD'){
         return false;
         }
         elseif($permission == 'CR'){
         return false;
-        }else{
-        return true;
         }
+
         }),
         'show' => new ActionRender(function () use ($permission) {
         if($permission == 'R'){
@@ -72,15 +70,12 @@ class <?= $class_name ?> extends BaseController
         return true;
         }elseif($permission == 'RUD'){
         return true;
-        }elseif($permission == 'CRU'){
+        }elseif($permission == 'CRUD'){
         return true;
         }
         elseif($permission == 'CR'){
         return true;
-        }else{
-        return true;
         }
-        return true;
         }),
 
     ];

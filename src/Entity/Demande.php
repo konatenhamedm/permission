@@ -68,9 +68,13 @@ class Demande
     #[ORM\Column(length: 255,nullable:true)]
     private ?string $alerte = null;
 
+    #[ORM\OneToMany(mappedBy: 'demande', targetEntity: DemandeBrouillon::class)]
+    private Collection $demandeBrouillons;
+
     public function __construct()
     {
               $this->motifs = new ArrayCollection();
+              $this->demandeBrouillons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -272,6 +276,36 @@ class Demande
     public function setAlerte(string $alerte): static
     {
         $this->alerte = $alerte;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandeBrouillon>
+     */
+    public function getDemandeBrouillons(): Collection
+    {
+        return $this->demandeBrouillons;
+    }
+
+    public function addDemandeBrouillon(DemandeBrouillon $demandeBrouillon): static
+    {
+        if (!$this->demandeBrouillons->contains($demandeBrouillon)) {
+            $this->demandeBrouillons->add($demandeBrouillon);
+            $demandeBrouillon->setDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandeBrouillon(DemandeBrouillon $demandeBrouillon): static
+    {
+        if ($this->demandeBrouillons->removeElement($demandeBrouillon)) {
+            // set the owning side to null (unless already changed)
+            if ($demandeBrouillon->getDemande() === $this) {
+                $demandeBrouillon->setDemande(null);
+            }
+        }
 
         return $this;
     }

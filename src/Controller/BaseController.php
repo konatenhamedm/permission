@@ -22,6 +22,7 @@ class BaseController extends AbstractController
     protected $menu;
     protected UserPasswordHasherInterface $hasher;
     protected $workflow;
+    protected $groupe ;
     
 
 
@@ -33,6 +34,7 @@ class BaseController extends AbstractController
         $this->menu = $menu;
         $this->hasher = $hasher;
         $this->workflow = $workflow;
+        $this->groupe = $security->getUser()->getGroupe()->getName();
     }
 
    
