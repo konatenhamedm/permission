@@ -73,7 +73,7 @@ class AvisConfigDirecteurController extends AbstractController
             ]
         ]);
 
-        return $this->render('directeur/config/index.html.twig', [
+        return $this->render('directeur/config/index_avis.html.twig', [
             'modules' => $modules,
             'module_name' => self::MODULE_NAME,
             'breadcrumb' => $breadcrumb
@@ -97,4 +97,6 @@ class AvisConfigDirecteurController extends AbstractController
 
         return $this->render('directeur/config/liste.html.twig', ['links' => $parametres[$module] ?? []]);
     }
+
+  
 }

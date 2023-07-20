@@ -3,7 +3,6 @@
 namespace App\Controller\Collaborateur;
 
 use App\Entity\Demande;
-use App\Form\Demande2Type;
 use App\Repository\DemandeRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -17,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\BaseController;
+use App\Form\DemandeType;
 use Doctrine\ORM\QueryBuilder;
 
 #[Route('/collaborateur/demande')]
@@ -149,7 +149,7 @@ class DemandeController extends BaseController
     public function new(Request $request, DemandeRepository $demandeRepository, FormError $formError): Response
     {
         $demande = new Demande();
-        $form = $this->createForm(Demande2Type::class, $demande, [
+        $form = $this->createForm(DemandeType::class, $demande, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_collaborateur_demande_new')
         ]);
@@ -209,7 +209,7 @@ class DemandeController extends BaseController
     public function edit(Request $request, Demande $demande, DemandeRepository $demandeRepository, FormError $formError): Response
     {
 
-        $form = $this->createForm(Demande2Type::class, $demande, [
+        $form = $this->createForm(DemandeType::class, $demande, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_collaborateur_demande_edit', [
                 'id' =>  $demande->getId()

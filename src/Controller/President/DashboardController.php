@@ -416,7 +416,7 @@ class DashboardController extends AbstractController
                 "data" => $nombre,
             ]
         ];
-
+       // dd($mois);
 
 
         return $this->json(['series' => $series, 'mois' => $mois]);

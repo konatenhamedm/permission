@@ -218,18 +218,18 @@ class DemandeController extends BaseController
                         'target' => '#exampleModalSizeSm2',
 
                         'actions' => [
-                            'edit' => [
+                           /*  'edit' => [
                                 'url' => $this->generateUrl('app_demande_demande_edit_workflow_document', ['id' => $value])
                                 , 'ajax' => true
                                 , 'icon' => '%icon% bi bi-pen'
                                 , 'attrs' => ['class' => 'btn-success']
                                 , 'render' => $renders['edit']
-                            ],
+                            ], */
                             'edit_document' => [
                                 'url' => $this->generateUrl('app_demande_demande_edit_workflow_verification', ['id' => $value])
                                 , 'ajax' => true
                                 , 'icon' => '%icon% bi bi-pen'
-                                , 'attrs' => ['class' => 'btn-success']
+                                , 'attrs' => ['class' => 'btn-success','title'=>'Valider le document']
                                 , 'render' => $renders['edit_document']
                             ],
                             'validation_directeur' => [

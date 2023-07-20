@@ -53,6 +53,13 @@ class DemandeRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
     }
+    public function getMois(){
+        return $this->createQueryBuilder('d')
+        ->select("DATE_FORMAT(d.dateDebut,'%M') as mois")
+        ->groupBy('mois')
+        ->getQuery()
+        ->getResult();
+    }
 
     public function getAnneeFin(){
         return $this->createQueryBuilder('d')
@@ -394,7 +401,7 @@ return $stmt->fetchAllAssociative();
 
 
 
-    public function getDemandeByMonthByEntreprise($date,$entreprise)
+public function getDemandeByMonthByEntreprise($date,$entreprise)
 {
         $em = $this->getEntityManager();
         $connection = $em->getConnection();

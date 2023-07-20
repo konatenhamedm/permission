@@ -32,9 +32,5 @@ class SecurityController extends AbstractController
     }
 
 
-    #[Route(path: '/2fa', name: '2fa_login')]
-    public function check2fa()
-    {
-        return $this->render('security/2fa_form.html.twig');
-    }
+
 }

@@ -1,0 +1,289 @@
+{% block page_content %}
+    {% form_theme form 'widget/fields-block.html.twig' %}
+    {% from '_macros/general.html.twig' import prototype_employe_service %}
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+            Détails statistiques de | 
+            {{ employe.getNomComplet }}
+        </h5>
+        <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <span class="svg-icon svg-icon-2x text-white">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
+                    <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
+                </svg>
+            </span>
+        </div>
+    </div>
+    {{ form_start(form, {'attr': {'role':'form', 'class': 'form' }}
+    ) }}
+        
+    <div class="modal-body body-container">
+        {{ include('_includes/ajax/response.html.twig') }}
+        <div class="row">
+            <div class="col-md-3"> </div>
+            <div class="col-md-6"> {{ form_row(form.dateDebut) }}</div>
+            <div class="col-md-3"> </div>
+           {#  <div class="col-md-6">
+                {{ form_row(form.mois) }}
+            </div> #}
+           
+        </div>
+        <br>
+            <div class="row">
+                <div class="col-md-12" style="border:3px solid #000;">
+                    <figure class="highcharts-figure">
+                        <div id="container"></div>
+                        <div id="sliders">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label for="alpha">
+                                            Premier angle
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <input id="alpha" type="range" min="0" max="45" value="15" />
+                                        <span id="alpha-value" class="value"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="beta">
+                                            deuxieme  angle
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <input id="beta" type="range" min="-45" max="45" value="15" />
+                                        <span id="beta-value" class="value"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="depth">
+                                            Depth
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <input id="depth" type="range" min="20" max="100" value="50" />
+                                        <span id="depth-value" class="value"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </figure>
+                </div>
+                {# <div class="col-md-6" style="border:3px solid #000">
+                    <div id="container-2"></div>
+                </div> #}
+            {#  <div class="col-md-4">
+            
+                            </div> #}
+            </div>
+        </div>
+        <div class="modal-footer">
+            {# {{ include('_includes/ajax/loader.html.twig') }} #}
+            <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">
+                Annuler
+            </button>
+           
+        </div>
+        {{ form_end(form, {render_rest: false}) }}
+    {% endblock %}
+    {% block java %}
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+        <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/cylinder.js"></script>
+        <script>
+        $(document).ready(function () {
+            //load_tab('chartTabs');
+
+               Highcharts.setOptions({
+                        lang: {
+                                loading: 'Chargement...',
+                                months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+                                weekdays: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+                                shortMonths: ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'aoû', 'sep', 'oct', 'nov', 'déc'],
+                                exportButtonTitle: "Exporter",
+                                printButtonTitle: "Imprimer",
+                                rangeSelectorFrom: "Du",
+                                rangeSelectorTo: "au",
+                                rangeSelectorZoom: "Période",
+                                downloadPNG: 'Télécharger en PNG',
+                                downloadJPEG: 'Télécharger en JPEG',
+                                downloadPDF: 'Télécharger en PDF',
+                                downloadSVG: 'Télécharger en SVG',
+                                resetZoom: "Réinitialiser le zoom",
+                                resetZoomTitle: "Réinitialiser le zoom",
+                                thousandsSep: " ",
+                                decimalPoint: ',' 
+                            }        
+                    });
+
+        });
+    </script>
+        <script>
+        $(function () {
+            init_select2();
+           // load_data();
+            const $dateDebut = $('#{{ form.dateDebut.vars.id }}');
+          //  const $mois = $('#{{ form.mois.vars.id }}');
+            //const $employe = 
+            const $error = $('.alert-error');
+         $(".body-container").on('click',function(){
+             $dateDebut.on('change', function () {
+               // alert("hhh")
+                const $this = $(this);
+                const current_value = $this.find('option:selected').attr('value');
+                
+                $error.html('');
+                if ($this.val()) {
+                     load_data(current_value, {date: $this.val(),employe:{{ employe.id }}});
+                } else {
+                    $error.html('Veuillez sélectionner un type de contrat');
+                }
+               
+            });
+
+
+
+           // $mois.on('change', function () {
+                // alert("hhh")
+                 //const $this = $(this);
+                // const current_value = $this.find('option:selected').attr('value');
+                
+                 //$error.html('');
+                 //if ($this.val()) {
+                    //  load_data_2(current_value, {date:"null",mois: $this.val(),employe:{{ employe.id }}});
+                 //} else {
+                     //$error.html('Veuillez sélectionner un type de contrat');
+                // }
+                
+            // });
+
+         })
+function load_data(contrat, filters = []) {
+                $.getJSON("{{ path('app_president_courbe_details_employe') }}", {filters: filters}, function (data) {
+                    console.log(data.series);
+                     
+                   // Set up the chart
+const chart = new Highcharts.Chart({
+    chart: {
+        renderTo: 'container',
+        type: 'column',
+        options3d: {
+            enabled: true,
+            alpha: 15,
+            beta: 15,
+            depth: 50,
+            viewDistance: 25
+        }
+    },
+    xAxis: {
+        categories: data.moisDemande
+    },
+    yAxis: {
+        title: {
+            enabled: false
+        }
+    },
+    tooltip: {
+        headerFormat: '<b>{point.key}</b><br>',
+        pointFormat: 'Cars sold: {point.y}'
+    },
+    title: {
+        text: 'Evolution des demandes par mois',
+        align: 'left'
+    },
+    subtitle: {
+        text: '',
+        align: 'left'
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        column: {
+            depth: 25
+        }
+    },
+    series: data.seriesDemande
+});
+
+function showValues() {
+    document.getElementById('alpha-value').innerHTML = chart.options.chart.options3d.alpha;
+    document.getElementById('beta-value').innerHTML = chart.options.chart.options3d.beta;
+    document.getElementById('depth-value').innerHTML = chart.options.chart.options3d.depth;
+}
+
+// Activate the sliders
+document.querySelectorAll('#sliders input').forEach(input => input.addEventListener('input', e => {
+    chart.options.chart.options3d[e.target.id] = parseFloat(e.target.value);
+    showValues();
+    chart.redraw(false);
+}));
+
+showValues();
+
+
+                     });
+            }
+
+
+            function load_data_2(contrat, filters = []) {
+                $.getJSON("{{ path('app_president_courbe_details_employe') }}", {filters: filters}, function (data) {
+
+                Highcharts.chart('container-2', {
+                    chart: {
+                        type: 'spline'
+                    },
+                    title: {
+                        text: 'Evolution des demandes accéptées vs demandes réfusées'
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories: data.jour,
+                        accessibility: {
+                            description: 'Months of the year'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Nombre de demandes'
+                        },
+                        labels: {
+                            format: '{value}'
+                        }
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: data.dataFusion
+                });
+
+
+                })
+
+            }
+      
+
+
+        });
+    </script>
+    {% endblock %}
+    

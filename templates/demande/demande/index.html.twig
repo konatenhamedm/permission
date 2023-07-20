@@ -6,7 +6,7 @@
 {% block body %}
 <div class="card shadow-sm">
     <div class="card-header card-header-sm">
-        <h3 class="card-title"> {{ titre}}</h3>
+        <h3 class="card-title"> Demande</h3>
         <div class="card-toolbar">
         {#     {% if permition in ["CR","CRU","CRUD"] %}
             <a href="{{ path('app_president_demande_new') }}" class="btn btn-main btn-sm"  
@@ -56,7 +56,7 @@
 </div>
 {% endblock %}
 
-
+{% if permition != null %}
 {% block java %}
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
     <script>
@@ -71,3 +71,4 @@
         });
     </script>
 {% endblock %}
+{% endif %}

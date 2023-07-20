@@ -21,41 +21,6 @@ class ParametreController extends BaseController
     const INDEX_ROOT_NAME = 'app_config_parametre_index';
 
 
-    #[Route('/api/civilite', name: 'api_civilite_liste', methods: ['GET','POST'])]
-    public function liste1(CiviliteRepository $civiliteRepository){
-        $data = $civiliteRepository->findAll();
-
-        // On spécifie qu'on utilise l'encodeur JSON
-        $encoders = [new JsonEncoder()];
-
-        // On instancie le "normaliseur" pour convertir la collection en tableau
-        $normalizers = [new ObjectNormalizer()];
-
-        // On instancie le convertisseur
-        $serializer = new Serializer($normalizers, $encoders);
-
-        // On convertit en json
-        $jsonContent = $serializer->serialize($data, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            }
-        ]);
-
-        // On instancie la réponse
-        $response = new Response($jsonContent);
-
-        // On ajoute l'entête HTTP
-        $response->headers->set('Content-Type', 'application/json');
-
-        // On envoie la réponse
-        return $response;
-    }
-
-    /* private $menu;
-     public function __construct(Menu $menu){
-         $this->menu = $menu;
-     }*/
-
     #[Route(path: '/', name: 'app_config_parametre_index', methods: ['GET', 'POST'])]
     public function index(Request $request, Breadcrumb $breadcrumb): Response
     {

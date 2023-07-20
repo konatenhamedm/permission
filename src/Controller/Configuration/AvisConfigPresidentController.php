@@ -54,7 +54,14 @@ class AvisConfigPresidentController extends AbstractController
                 'role' => 'ROLE_ALL',
                 'name' => 'mouvement',
                 'href' => $this->generateUrl('app_config_president_ls', ['module' => 'demande_r'])
-            ]
+            ],
+            [
+                'label' => 'Infos utilisateurs',
+                'icon' => 'bi bi-people',
+                'role' => 'ROLE_ALL',
+                'name' => 'infos',
+                'href' => $this->generateUrl('app_config_president_ls', ['module' => 'infos'])
+            ],
            
         ];
 
@@ -88,12 +95,14 @@ class AvisConfigPresidentController extends AbstractController
             'approbation_dir' => [
                 [
                     'label' => 'Suzang group ',
+                    'affiche_total'=>'true',
                     'etat'=>'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_suzang',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_directeur','entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_appatam',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_directeur','entreprise' => 'appatam'])
@@ -106,12 +115,14 @@ class AvisConfigPresidentController extends AbstractController
                 ],
                 [
                     'label' => 'Djela',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_djela',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_directeur','entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_yefien',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_directeur','entreprise' => 'yefien'])
@@ -121,30 +132,35 @@ class AvisConfigPresidentController extends AbstractController
             'approbation_pr' => [
                 [
                     'label' => 'suzang group',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider_attente_document',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_su',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_attente_document','entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
+                     'affiche_total'=>'true',
                      'etat'=>'demande_valider_attente_document',
                     'id' => 'param_initie_demande_appatam',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_attente_document','entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
+                     'affiche_total'=>'true',
                      'etat'=>'demande_valider_attente_document',
                     'id' => 'param_validation_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_attente_document','entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
+                     'affiche_total'=>'true',
                      'etat'=>'demande_valider_attente_document',
                     'id' => 'param_livraison_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_attente_document','entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
+                     'affiche_total'=>'true',
                      'etat'=>'demande_valider_attente_document',
                     'id' => 'param_livrer_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_attente_document','entreprise' => 'yefien'])
@@ -154,30 +170,35 @@ class AvisConfigPresidentController extends AbstractController
             'document' => [
                 [
                     'label' => 'suzang group',
+                     'affiche_total'=>'true',
                     'etat'=>'document_enregistre',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_su',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
+                     'affiche_total'=>'true',
                      'etat'=>'document_enregistre',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_appatam',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
+                     'affiche_total'=>'true',
                      'etat'=>'document_enregistre',
                     'id' => 'param_validation_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
+                     'affiche_total'=>'true',
                      'etat'=>'document_enregistre',
                     'id' => 'param_livraison_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
+                     'affiche_total'=>'true',
                      'etat'=>'document_enregistre',
                     'id' => 'param_livrer_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'yefien'])
@@ -187,30 +208,35 @@ class AvisConfigPresidentController extends AbstractController
             'demande_t' => [
                 [
                     'label' => 'suzang group',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_su',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_appatam',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider',
                     'id' => 'param_validation_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider',
                     'id' => 'param_livraison_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_valider',
                     'id' => 'param_livrer_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'yefien'])
@@ -219,35 +245,77 @@ class AvisConfigPresidentController extends AbstractController
             'demande_r' => [
                 [
                     'label' => 'suzang group',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_refuser',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_su',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_refuser',
-                    'id' => 'param_initie_demande',
+                    'id' => 'param_initie_demande_appatam',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_refuser',
                     'id' => 'param_validation_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_refuser',
                     'id' => 'param_livraison_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
+                     'affiche_total'=>'true',
                     'etat'=>'demande_refuser',
                     'id' => 'param_livrer_demande',
                     'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'yefien'])
                 ],
             ],
+            'infos'=>[
+                [
+                    'label' => 'suzang group',
+                     'affiche_total'=>'false',
+                    'etat'=>'demande_refuser',
+                    'id' => 'param_initie_demande_su',
+                    'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT4'])
+                ],
+                [
+                    'label' => 'Appatam',
+                     'affiche_total'=>'false',
+                    'etat'=>'demande_refuser',
+                    'id' => 'param_initie_demande_appatam',
+                    'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT1'])
+                ],
+                [
+                    'label' => 'Socopi',
+                     'affiche_total'=>'false',
+                    'etat'=>'demande_refuser',
+                    'id' => 'param_validation_demande',
+                    'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT5'])
+                ],
+                [
+                    'label' => 'Djela',
+                     'affiche_total'=>'false',
+                    'etat'=>'demande_refuser',
+                    'id' => 'param_livraison_demande',
+                    'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT3'])
+                ],
+                [
+                    'label' => 'Yefien',
+                     'affiche_total'=>'false',
+                    'etat'=>'demande_refuser',
+                    'id' => 'param_livrer_demande',
+                    'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT2'])
+                ],
+            ]
             
         ];
 

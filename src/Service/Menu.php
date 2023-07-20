@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\ModuleGroupePermition;
 use App\Entity\ConfigApp;
 use App\Entity\Demande;
+use App\Entity\DemandeBrouillon;
+use App\Entity\Employe;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -62,8 +64,19 @@ class Menu
         return $repo;
     }
 
+    public function nombreEmploye($entreprise){
+        $repo = $this->em->getRepository(Employe::class)->nombreEmploye($entreprise);
+       // dd($repo );
+        return $repo;
+    }
+
     public function nombreDemandeStat($etat,$user){
         $repo = $this->em->getRepository(Demande::class)->nombreDemandeStat($etat,$user);
+        return $repo;
+    }
+
+    public function nombreBroullionStat($etat,$entreprise){
+        $repo = $this->em->getRepository(DemandeBrouillon::class)->nombreBroullionStat($etat,$entreprise);
         return $repo;
     }
 

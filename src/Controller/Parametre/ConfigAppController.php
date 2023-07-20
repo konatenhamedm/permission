@@ -32,7 +32,7 @@ class ConfigAppController extends BaseController
     public function index(Request $request,ConfigAppRepository $configurationAppRepository ,DataTableFactory $dataTableFactory): Response
     {
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-
+//dd( $permission);
         $table = $dataTableFactory->create()
             ->add('entreprise', TextColumn::class, ['field' => 'e.denomination', 'label' => 'Entreprise'])
         ->createAdapter(ORMAdapter::class, [

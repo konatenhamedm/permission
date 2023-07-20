@@ -1,5 +1,3 @@
-imports:
-  - './workflows/'
 framework:
   workflows:
     demande:
@@ -46,3 +44,35 @@ framework:
         demande_refuser_president:
           from: demande_valider_directeur
           to: demande_refuser
+
+    demandeBrouillon:
+      type: 'state_machine'
+      audit_trail:
+        enabled: true
+      marking_store:
+        type: 'method'
+        property: 'etat'
+      supports:
+        - App\Entity\DemandeBrouillon
+      initial_marking: brouillon_initie
+      places:
+        - brouillon_initie
+        - brouillon_valider
+        - brouillon_review_president
+        - brouillon_rejeter
+      transitions:
+        passer:
+          from: brouillon_initie
+          to: brouillon_valider
+        review_president:
+          from: brouillon_initie
+          to: brouillon_review_president
+        rejeter_directeur:
+          from: brouillon_initie
+          to: brouillon_rejeter
+        rejeter_president:
+          from: brouillon_review_president
+          to: brouillon_rejeter
+        
+
+          

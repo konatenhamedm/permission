@@ -56,10 +56,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Demande::class)]
     private Collection $demandes;
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: DemandeBrouillon::class)]
+    private Collection $demandeBrouillons;
+
     public function __construct()
     {
         // $this->groupes = new ArrayCollection();
         $this->demandes = new ArrayCollection();
+        $this->demandeBrouillons = new ArrayCollection();
 
     }
     public function getId(): ?int
@@ -394,6 +398,36 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
             // set the owning side to null (unless already changed)
             if ($demande->getUtilisateur() === $this) {
                 $demande->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandeBrouillon>
+     */
+    public function getDemandeBrouillons(): Collection
+    {
+        return $this->demandeBrouillons;
+    }
+
+    public function addDemandeBrouillon(DemandeBrouillon $demandeBrouillon): static
+    {
+        if (!$this->demandeBrouillons->contains($demandeBrouillon)) {
+            $this->demandeBrouillons->add($demandeBrouillon);
+            $demandeBrouillon->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandeBrouillon(DemandeBrouillon $demandeBrouillon): static
+    {
+        if ($this->demandeBrouillons->removeElement($demandeBrouillon)) {
+            // set the owning side to null (unless already changed)
+            if ($demandeBrouillon->getUtilisateur() === $this) {
+                $demandeBrouillon->setUtilisateur(null);
             }
         }
 

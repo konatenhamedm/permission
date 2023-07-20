@@ -6,7 +6,9 @@
 {% block body %}
 <div class="card shadow-sm">
     <div class="card-header card-header-sm">
+    {% if permition != null %}
         <h3 class="card-title"> Liste des <?= $entity_twig_var_plural ?></h3>
+        {% endif %}  
         <div class="card-toolbar">
             {% if permition in ["CR","CRU","CRUD"] %}
             <a href="{{ path('<?= $route_name ?>_new') }}" class="btn btn-main btn-sm"  
