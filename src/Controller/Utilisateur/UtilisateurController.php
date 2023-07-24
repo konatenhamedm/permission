@@ -48,7 +48,13 @@ class UtilisateurController extends BaseController
                     ->from(Utilisateur::class, 'u')
                     ->join('u.employe', 'e')
                     ->join('e.fonction', 'f')
-                ;
+                    ->join('e.entreprise', 'entreprise')
+                    ;
+                    if($this->security->getUser()->getGroupe()->getName() != "Présidents"){
+                            $qb->andWhere('entreprise.code = :entreprise')
+                                ->setParameter('entreprise',$this->security->getUser()->getEmploye()->getEntreprise()->getCode());
+                       
+                            }
             }
         ])
         ->setName('dt_app_utilisateur_utilisateur');

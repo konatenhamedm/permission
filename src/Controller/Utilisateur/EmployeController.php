@@ -35,7 +35,7 @@ class EmployeController extends BaseController
 
     #[Route('/', name: 'app_utilisateur_employe_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
-    {
+    {$groupeName = $this->security->getUser()->getGroupe()->getName();
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
 
         $table = $dataTableFactory->create()
@@ -52,7 +52,15 @@ class EmployeController extends BaseController
                     ->from(Employe::class, 'e')
                     ->join('e.civilite', 'civilite')
                     ->join('e.fonction', 'fonction')
+                    ->join('e.entreprise', 'entreprise')
+                    /*->andWhere('entreprise.code = :entreprise')*/
+
                 ;
+                if($this->security->getUser()->getGroupe()->getName() != "Présidents"){
+                    $qb->andWhere('entreprise.code = :entreprise')
+                        ->setParameter('entreprise',$this->security->getUser()->getEmploye()->getEntreprise()->getCode());
+               
+                    }
             }
         ])
         ->setName('dt_app_utilisateur_employe');
