@@ -31,61 +31,57 @@ use Symfony\Component\Routing\Annotation\Route;
 class DemandeSimpleController extends BaseController
 {
 
- 
-
     #[Route('/{etat}/liste/avis', name: 'app_demande_demande_avis_ls', methods: ['GET', 'POST'])]
     public function listeavis(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
     {
-
+        //dd('ff');
         $table = $dataTableFactory->create()
-            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut','format' => 'd-m-Y',"searchable"=>true,'globalSearchable'=>true])
-            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin','format' => 'd-m-Y'])
+            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
+            /* ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y']) */
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
             ->add('entreprise', TextColumn::class, ['label' => 'Entreprise', 'field' => 'en.denomination'])
             ->add('prenom', TextColumn::class, ['label' => 'Prenoms', 'field' => 'e.prenom'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Demande::class,
-                'query' => function(QueryBuilder $qb)  use ($etat) {
+                'query' => function (QueryBuilder $qb)  use ($etat) {
                     $qb->select('d,u, e, f, en')
                         ->from(Demande::class, 'd')
                         ->join('d.utilisateur', 'u')
                         ->join('u.employe', 'e')
                         ->join('e.entreprise', 'en')
-                        ->orderBy('d.dateCreation','ASC')
+                        ->orderBy('d.dateCreation', 'ASC')
                         ->join('e.fonction', 'f');
-                       /* ->andWhere('e.entreprise =:user')
+                    /* ->andWhere('e.entreprise =:user')
                         ->setParameter('user',$this->security->getUser()->getEmploye()->getEntreprise());*/
 
-                    if($this->security->getUser()->getGroupe()->getName() != "Présidents"){
+                    if ($this->security->getUser()->getGroupe()->getName() != "Présidents") {
                         $qb->andWhere('e.entreprise =:user')
-                            ->setParameter('user',$this->security->getUser()->getEmploye()->getEntreprise());
+                            ->setParameter('user', $this->security->getUser()->getEmploye()->getEntreprise());
                     }
 
-
-                    if ($etat == 'demande_initie') {
-                        $qb->andWhere("d.etat =:etat")
-                            ->setParameter('etat', "demande_initie");
-                    } elseif($etat == 'demande_valider_directeur') {
+                    if ($etat == 'demande_valider_directeur') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_directeur");
                     }
-                    elseif($etat == 'demande_valider_attente_document') {
+                    if ($etat == 'demande_initie') {
+                        $qb->andWhere("d.etat =:etat")
+                            ->setParameter('etat', "demande_initie");
+                    } elseif ($etat == 'demande_valider_directeur') {
+                        $qb->andWhere("d.etat =:etat")
+                            ->setParameter('etat', "demande_valider_directeur");
+                    } elseif ($etat == 'demande_valider_attente_document') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_attente_document");
-                    }
-                    elseif($etat == 'document_enregistre') {
+                    } elseif ($etat == 'document_enregistre') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "document_enregistre");
-                    }
-                    elseif($etat == 'demande_valider') {
+                    } elseif ($etat == 'demande_valider') {
+                        $qb->andWhere("d.etat =:etat")
+                            ->setParameter('etat', "demande_valider");
+                    } elseif ($etat == 'demande_refuser') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider");
                     }
-                    elseif($etat == 'demande_refuser') {
-                        $qb->andWhere("d.etat =:etat")
-                            ->setParameter('etat', "demande_valider");
-                    }
-
                 }
                 /*->add('numero', TextColumn::class, ['label' => 'Numéro', 'className' => 'w-100px'])
                 ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -104,15 +100,15 @@ class DemandeSimpleController extends BaseController
 
                     }*/
             ])
-            ->setName('dt_app_demande_demande_avis_'.$etat);
+            ->setName('dt_app_demande_demande_avis_' . $etat);
 
-        if($this->security->getUser()->getGroupe()->getName() == "Présidents"){
+        if ($this->security->getUser()->getGroupe()->getName() == "Présidents") {
             $renders = [
-                'edit' =>  new ActionRender(fn() => $etat == false),
-                'validation_directeur' =>  new ActionRender(fn() => false),
-                'validation_president' =>  new ActionRender(fn() => $etat == 'demande_valider_directeur' ),
-               
-               /*  'show' =>  new ActionRender(function () {
+                'edit' =>  new ActionRender(fn () => $etat == false),
+                'validation_directeur' =>  new ActionRender(fn () => false),
+                'validation_president' =>  new ActionRender(fn () => $etat == 'demande_valider_directeur'),
+
+                /*  'show' =>  new ActionRender(function () {
                     return true;
                 }), */
                 'show' =>  new ActionRender(function () {
@@ -120,19 +116,20 @@ class DemandeSimpleController extends BaseController
                 }),
 
             ];
-        }else{
+        } else {
             $renders = [
-                'edit' =>  new ActionRender(fn() => $etat == 'document_enregistre'),
-                'validation_directeur' =>  new ActionRender(fn() => $etat == 'demande_initie'),
-                'validation_president' =>  new ActionRender(fn() => false),
+                'edit' =>  new ActionRender(fn () => $etat == 'demande_valider_attente_document'),
+                'validation_directeur' =>  new ActionRender(fn () => $etat == 'demande_initie'),
+                'validation_president' =>  new ActionRender(fn () => false),
                 //'imprimer' =>  new ActionRender(fn() => $etat == 'demande_livrer'),
-               /*  'show' =>  new ActionRender(function () {
+                /*  'show' =>  new ActionRender(function () {
                     return true;
                 }), */
-                'shows' =>  new ActionRender(function () use ($etat){
+                'shows' =>  new ActionRender(function () use ($etat) {
                     return  true;
                 }),
-                'verification' => new ActionRender(fn() => $etat == 'document_enregistre'),
+                //'verification' => new ActionRender(fn () => $etat == 'document_enregistre'),
+                'verification' => new ActionRender(fn () => $etat == 'demande_valider_attente_document'),
             ];
         }
         /*$renders = [
@@ -158,40 +155,24 @@ class DemandeSimpleController extends BaseController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions'
-                , 'orderable' => false
-                ,'globalSearchable' => false
-                ,'className' => 'grid_row_actions'
-                , 'render' => function ($value, Demande $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Demande $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-xs btn-clean btn-icon mr-2 ',
                         'target' => '#exampleModalSizeSm2',
 
                         'actions' => [
                             'edit' => [
-                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_verification', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-pen'
-                                , 'attrs' => ['class' => 'btn-success']
-                                , 'render' => $renders['edit']
+                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_verification', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-success'], 'render' => $renders['edit']
                             ],
                             'validation_directeur' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_directeur', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-pen'
-                                , 'attrs' => ['class' => 'btn-main']
-                                ,  'render' => $renders['validation_directeur']
+                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_directeur', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-main'],  'render' => $renders['validation_directeur']
                             ],
                             'validation_president' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_president', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-pen'
-                                , 'attrs' => ['class' => 'btn-main']
-                                ,  'render' => $renders['validation_president']
+                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_president', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-main'],  'render' => $renders['validation_president']
                             ],
-                             
+
                             /* 'show' => [
                                 'target' => '#exampleModalSizeSm2',
                                 'url' => $this->generateUrl('app_demande_demande_show', ['id' => $value])
@@ -202,11 +183,7 @@ class DemandeSimpleController extends BaseController
                             ], */
                             'shows' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('app_demande_demande_show_president', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-eye'
-                                , 'attrs' => ['class' => 'btn-default']
-                                ,  'render' => $renders['shows']
+                                'url' => $this->generateUrl('app_demande_demande_show_president', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-eye', 'attrs' => ['class' => 'btn-default'],  'render' => $renders['shows']
                             ]
                         ]
 
@@ -235,8 +212,8 @@ class DemandeSimpleController extends BaseController
     #[Route('/avis', name: 'app_demande_demande_index_avis', methods: ['GET', 'POST'])]
     public function indexavis(Request $request, DataTableFactory $dataTableFactory): Response
     {
-//dd($this->security->getUser()->getGroupe()->getName());
-        if($this->security->getUser()->getGroupe()->getName() == "Présidents"){
+        //dd($this->security->getUser()->getGroupe()->getName());
+        if ($this->security->getUser()->getGroupe()->getName() == "Présidents") {
             $etats = [
                 'demande_valider_directeur' => 'Attente approbation',
                 'demande_valider_attente_document' => 'Documents',
@@ -245,8 +222,9 @@ class DemandeSimpleController extends BaseController
                 'demande_refuser' => 'Demandes réfusées',
 
             ];
-        }else{
-            $etats = ['demande_initie' => 'Attente approbation',
+        } else {
+            $etats = [
+                'demande_initie' => 'Attente approbation',
                 'demande_valider_attente_document' => 'Documents',
                 'document_enregistre' => 'Vérification Document',
                 'demande_valider' => 'Demandes validées',
@@ -267,11 +245,11 @@ class DemandeSimpleController extends BaseController
 
         return $this->render('demande/demande/index_avis.html.twig', [
             'tabs' => $tabs,
-            'titre'=>"Liste des demandes"
+            'titre' => "Liste des demandes"
         ]);
     }
-    
-    
+
+
 
     #[Route('/{etat}', name: 'app_demande_demande_index', methods: ['GET', 'POST'])]
     public function index(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
@@ -280,44 +258,40 @@ class DemandeSimpleController extends BaseController
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), "app_demande_demande_index");
 
         $table = $dataTableFactory->create()
-            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut','format' => 'd-m-Y',"searchable"=>true,'globalSearchable'=>true])
-            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin','format' => 'd-m-Y'])
+            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
+            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prenoms', 'field' => 'e.prenom'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Demande::class,
-                'query' => function(QueryBuilder $qb)  use ($etat) {
+                'query' => function (QueryBuilder $qb)  use ($etat) {
                     $qb->select('d,u, e, f')
                         ->from(Demande::class, 'd')
                         ->join('d.utilisateur', 'u')
                         ->join('u.employe', 'e')
                         ->join('e.fonction', 'f')
                         ->andWhere('d.utilisateur =:user')
-                        ->orderBy('d.dateCreation','ASC')
-                        ->setParameter('user',$this->security->getUser());
+                        ->orderBy('d.dateCreation', 'ASC')
+                        ->setParameter('user', $this->security->getUser());
 
                     if ($etat == 'demande_initie') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_initie");
-                    } elseif($etat == 'demande_valider_directeur') {
+                    } elseif ($etat == 'demande_valider_directeur') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_directeur");
-                    }
-                    elseif($etat == 'demande_valider_attente_document') {
+                    } elseif ($etat == 'demande_valider_attente_document') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_attente_document");
-                    }
-                    elseif($etat == 'document_enregistre') {
+                    } elseif ($etat == 'document_enregistre') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "document_enregistre");
-                    }
-                    elseif($etat == 'demande_valider') {
+                    } elseif ($etat == 'demande_valider') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider");
                     }
-
                 }
-            /*->add('numero', TextColumn::class, ['label' => 'Numéro', 'className' => 'w-100px'])
+                /*->add('numero', TextColumn::class, ['label' => 'Numéro', 'className' => 'w-100px'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Offre::class,
@@ -334,19 +308,19 @@ class DemandeSimpleController extends BaseController
 
                 }*/
             ])
-            ->setName('dt_app_demande_demande_'.$etat);
+            ->setName('dt_app_demande_demande_' . $etat);
 
         $renders = [
-            'edit' =>  new ActionRender(function () use ($etat){
-                return $etat !='demande_valider_directeur';
+            'edit' =>  new ActionRender(function () use ($etat) {
+                return $etat != 'demande_valider_directeur';
             }),
-            'show' =>  new ActionRender(function () use ($etat){
+            'show' =>  new ActionRender(function () use ($etat) {
                 return true;
             }),
-            'delete' => new ActionRender(function () use ($etat){
-                return $etat !='demande_valider_directeur';
+            'delete' => new ActionRender(function () use ($etat) {
+                return $etat != 'demande_valider_directeur';
             }),
-            'document' =>  new ActionRender(fn() => ($etat !='demande_valider_directeur' && $etat == 'demande_valider_attente_document')),
+            'document' =>  new ActionRender(fn () => ($etat != 'demande_valider_directeur' && $etat == 'demande_valider_attente_document')),
 
         ];
 
@@ -362,47 +336,27 @@ class DemandeSimpleController extends BaseController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions'
-                , 'orderable' => false
-                ,'globalSearchable' => false
-                ,'className' => 'grid_row_actions'
-                , 'render' => function ($value, Demande $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Demande $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-xs btn-clean btn-icon mr-2 ',
                         'target' => '#exampleModalSizeSm2',
 
                         'actions' => [
                             'edit' => [
-                                'url' => $this->generateUrl('app_demande_demande_edit', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-pen'
-                                , 'attrs' => ['class' => 'btn-default','tile'=>'yes']
-                                , 'render' => $renders['edit']
+                                'url' => $this->generateUrl('app_demande_demande_edit', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-default', 'tile' => 'yes'], 'render' => $renders['edit']
                             ],
                             'delete' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('app_demande_demande_delete', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-trash'
-                                , 'attrs' => ['class' => 'btn-main']
-                                ,  'render' => $renders['delete']
+                                'url' => $this->generateUrl('app_demande_demande_delete', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-trash', 'attrs' => ['class' => 'btn-main'],  'render' => $renders['delete']
                             ],
                             'document' => [
                                 'target' => '#exampleModalSizeLg2',
-                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_document', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-file-binary'
-                                , 'attrs' => ['class' => 'btn-main']
-                                ,  'render' => $renders['document']
+                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_document', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-file-binary', 'attrs' => ['class' => 'btn-main'],  'render' => $renders['document']
                             ],
 
                             'show' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('app_demande_demande_show', ['id' => $value])
-                                , 'ajax' => true
-                                , 'icon' => '%icon% bi bi-eye'
-                                , 'attrs' => ['class' => 'btn-main']
-                                ,  'render' => $renders['show']
+                                'url' => $this->generateUrl('app_demande_demande_show', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-eye', 'attrs' => ['class' => 'btn-main'],  'render' => $renders['show']
                             ]
                         ]
 
@@ -425,14 +379,14 @@ class DemandeSimpleController extends BaseController
         return $this->render('demande/demande/index.html.twig', [
             'datatable' => $table,
             'etat' => $etat,
-            'titre'=>'Demande',
+            'titre' => 'Demande',
             'permition' => $permission,
         ]);
     }
 
-    
+
     #[Route('/{id}/show', name: 'app_demande_demande_show', methods: ['GET'])]
-    public function show(Request $request,Demande $demande): Response
+    public function show(Request $request, Demande $demande): Response
     {
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
             'method' => 'POST',
@@ -448,7 +402,7 @@ class DemandeSimpleController extends BaseController
         ]);
     }
     #[Route('/{id}/show/president', name: 'app_demande_demande_show_president', methods: ['GET'])]
-    public function showPresident(Request $request,Demande $demande,MotifRepository $motifRepository): Response
+    public function showPresident(Request $request, Demande $demande, MotifRepository $motifRepository): Response
     {
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
             'method' => 'POST',
@@ -471,7 +425,7 @@ class DemandeSimpleController extends BaseController
         $form = $this->createForm(DemandeType::class, $demande, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_demande_demande_edit', [
-                    'id' =>  $demande->getId()
+                'id' =>  $demande->getId()
             ])
         ]);
 
@@ -495,21 +449,18 @@ class DemandeSimpleController extends BaseController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = Response::HTTP_INTERNAL_SERVER_ERROR;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -548,10 +499,10 @@ class DemandeSimpleController extends BaseController
             $workflow = $this->workflow->get($demande, 'demande');
 
             if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'passer'){
+                if ($form->getClickedButton()->getName() === 'passer') {
                     try {
 
-                        if ($workflow->can($demande,'passer')){
+                        if ($workflow->can($demande, 'passer')) {
                             $workflow->apply($demande, 'passer');
                             $this->em->flush();
                         }
@@ -560,10 +511,10 @@ class DemandeSimpleController extends BaseController
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
                     $demandeRepository->save($demande, true);
-                }elseif($form->getClickedButton()->getName() === 'refuser'){
+                } elseif ($form->getClickedButton()->getName() === 'refuser') {
                     try {
 
-                        if ($workflow->can($demande,'demande_refuser')){
+                        if ($workflow->can($demande, 'demande_refuser')) {
                             $workflow->apply($demande, 'demande_refuser');
                             $this->em->flush();
                         }
@@ -572,8 +523,7 @@ class DemandeSimpleController extends BaseController
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
                     $demandeRepository->save($demande, true);
-                }
-                else{
+                } else {
                     $demandeRepository->save($demande, true);
                 }
                 //$demandeRepository->save($demande, true);
@@ -581,8 +531,6 @@ class DemandeSimpleController extends BaseController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -590,12 +538,11 @@ class DemandeSimpleController extends BaseController
                 if (!$isAjax) {
                     $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -633,10 +580,10 @@ class DemandeSimpleController extends BaseController
             $workflow = $this->workflow->get($demande, 'demande');
             //dd($form->getClickedButton()->getName());
             if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'passer'){
+                if ($form->getClickedButton()->getName() === 'passer') {
                     try {
 
-                        if ($workflow->can($demande,'passer')){
+                        if ($workflow->can($demande, 'passer')) {
                             $workflow->apply($demande, 'passer');
                             $this->em->flush();
                         }
@@ -645,15 +592,25 @@ class DemandeSimpleController extends BaseController
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
                     $demandeRepository->save($demande, true);
-                }else{
+                } elseif ($form->getClickedButton()->getName() === 'refuser') {
+                    try {
+
+                        if ($workflow->can($demande, 'demande_refuser')) {
+                            $workflow->apply($demande, 'demande_refuser');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+                    $demandeRepository->save($demande, true);
+                } else {
                     $demandeRepository->save($demande, true);
                 }
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -661,12 +618,11 @@ class DemandeSimpleController extends BaseController
                 if (!$isAjax) {
                     $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -680,10 +636,10 @@ class DemandeSimpleController extends BaseController
         ]);
     }
 
-
+    //firsttttttttttttttttttttttttttttttt
 
     #[Route('/{id}/edit/workflow_document', name: 'app_demande_demande_edit_workflow_document', methods: ['GET', 'POST'])]
-    public function editWorkflowDocument(Request $request, Demande $demande, DemandeRepository $demandeRepository,MotifRepository $repository, FormError $formError): Response
+    public function editWorkflowDocument(Request $request, Demande $demande, DemandeRepository $demandeRepository, MotifRepository $repository, FormError $formError): Response
     {
         /*dd();*/
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
@@ -717,23 +673,20 @@ class DemandeSimpleController extends BaseController
             $workflow = $this->workflow->get($demande, 'demande');
 
             if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'document_enregister'){
+                if ($form->getClickedButton()->getName() === 'document_enregister') {
                     try {
 
-                        if($workflow->can($demande,'document_enregister')){
+                        if ($workflow->can($demande, 'document_enregister')) {
                             $workflow->apply($demande, 'document_enregister');
                             $this->em->flush();
                         }
-
                     } catch (LogicException $e) {
 
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
 
                     $demandeRepository->save($demande, true);
-                }
-
-                else{
+                } else {
                     $demandeRepository->save($demande, true);
                     // return $this->redirect('app_demande_demande_index_avis');
                 }
@@ -741,8 +694,6 @@ class DemandeSimpleController extends BaseController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -750,12 +701,11 @@ class DemandeSimpleController extends BaseController
                 if (!$isAjax) {
                     $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -771,7 +721,7 @@ class DemandeSimpleController extends BaseController
     }
 
     #[Route('/{id}/edit/workflow_verification', name: 'app_demande_demande_edit_workflow_verification', methods: ['GET', 'POST'])]
-    public function editWorkflowVerification(Request $request,FichierRepository $fichierRepository, Demande $demande, DemandeRepository $demandeRepository,MotifRepository $repository, FormError $formError): Response
+    public function editWorkflowVerification(Request $request, FichierRepository $fichierRepository, Demande $demande, DemandeRepository $demandeRepository, MotifRepository $repository, FormError $formError): Response
     {
         //dd();
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
@@ -805,37 +755,42 @@ class DemandeSimpleController extends BaseController
             $workflow = $this->workflow->get($demande, 'demande');
 
             if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'document_verification_accepte'){
+
+
+                if ($form->getClickedButton()->getName() === 'document_enregister') {
+                    dd('ghgg');
+                    if ($workflow->can($demande, 'document_enregister')) {
+                        $workflow->apply($demande, 'document_enregister');
+                        $this->em->flush();
+                    }
+                }
+                if ($form->getClickedButton()->getName() === 'document_verification_accepte') {
                     try {
 
-                        if($workflow->can($demande,'document_verification_accepte')){
+                        if ($workflow->can($demande, 'document_verification_accepte')) {
                             $workflow->apply($demande, 'document_verification_accepte');
                             $this->em->flush();
                         }
-
                     } catch (LogicException $e) {
 
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
 
                     $demandeRepository->save($demande, true);
-                }elseif ($form->getClickedButton()->getName() === 'document_verification_refuse'){
+                } elseif ($form->getClickedButton()->getName() === 'document_verification_refuse') {
                     try {
 
-                        if($workflow->can($demande,'document_verification_refuse')){
+                        if ($workflow->can($demande, 'document_verification_refuse')) {
                             $workflow->apply($demande, 'document_verification_refuse');
                             $this->em->flush();
                         }
-
                     } catch (LogicException $e) {
 
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
 
                     $demandeRepository->save($demande, true);
-                }
-
-                else{
+                } else {
                     $demandeRepository->save($demande, true);
                     // return $this->redirect('app_demande_demande_index_avis');
                 }
@@ -843,8 +798,6 @@ class DemandeSimpleController extends BaseController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -852,12 +805,11 @@ class DemandeSimpleController extends BaseController
                 if (!$isAjax) {
                     $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -867,7 +819,7 @@ class DemandeSimpleController extends BaseController
 
         return $this->renderForm('demande/demande/edit_verification.html.twig', [
             'demande' => $demande,
-            'fichiers'=>$repository->findOneBySomeFields($demande),
+            'fichiers' => $repository->findOneBySomeFields($demande),
             'form' => $form,
         ]);
     }
@@ -878,14 +830,14 @@ class DemandeSimpleController extends BaseController
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
-                'app_demande_demande_delete'
-                ,   [
+                    'app_demande_demande_delete',
+                    [
                         'id' => $demande->getId()
                     ]
                 )
             )
             ->setMethod('DELETE')
-        ->getForm();
+            ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;

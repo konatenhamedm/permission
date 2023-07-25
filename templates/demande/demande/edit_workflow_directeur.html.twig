@@ -18,7 +18,15 @@
         {#  <div id="list-ligne" data-prototype="{{ list_ligne_motif(form.motifs.vars.prototype, 1)|e }}"></div>#}
         {{ include('_includes/ajax/response.html.twig') }}
         <div class="" style="border-bottom:3px solid #000">
-
+     {#      <div class="row">
+                <div class="col-md-8">
+                
+                </div>
+                <div class="col-md-4">
+                <a title="Inofs demandes utilisateur" href="{{ path('app_utilisateur_employe_infos_stats_simples',{'id':demande.utilisateur.employe.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#exampleModalSizeSm22">Inofs demandes utilisateur</a>
+                </div>
+          </div> #}
+          
 
                 <!--begin::Input group-->
                 <div class="row">
@@ -105,8 +113,34 @@
 {% block java %}
     <script>
 //alert($('.element').find('option:selected').attr('data-value'))
- 
+   
         $(function () {
+            var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
+
+            if (elements && elements.length > 0) {
+                elements.forEach((element) => {
+                    if (element.getAttribute("data-kt-initialized") === "1" ) {
+                        return;
+                    }
+
+                    const url = element.getAttribute('href');
+                    element.setAttribute("data-kt-initialized", "1");
+
+
+                    element.addEventListener("click", function(e) {
+                        e.preventDefault();
+
+                        const modalEl = document.querySelector(this.getAttribute("data-bs-stacked-modal"));
+
+                        if (modalEl) {
+                            const modal = new bootstrap.Modal(modalEl);
+                            modal.show(element);
+                        }
+                    });
+                });
+            }
+         init_select2('select', null, '#exampleModalSizeSm2');
+
  if($('.type').find('option:selected').attr('value') == "TYPE_JOURNEE"){
              $('.demi').hide();
                     $('.journee').show();

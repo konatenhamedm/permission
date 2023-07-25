@@ -1,29 +1,31 @@
-{# {% extends 'base-layout.html.twig' %}
+{#  {% extends 'base-layout.html.twig' %}
 
 {% block title %}Liste des demandes{% endblock %}
 {% block header %}demandes{% endblock %}
-{% block breadcrumb %}{% endblock %} #}
+{% block breadcrumb %}{% endblock %}  #}
 {% block body %}
 <div class="card shadow-sm">
     <div class="card-header card-header-sm">
-        <h3 class="card-title"> Demande</h3>
+        <h3 class="card-title"> {{ titre}}</h3>
         <div class="card-toolbar">
-        {#     {% if permition in ["CR","CRU","CRUD"] %}
-            <a href="{{ path('app_president_demande_new') }}" class="btn btn-main btn-sm"  
-                data-bs-toggle="modal" data-bs-target="#exampleModalSizeLg2">
+             {% if permition in ["CR","CRU","CRUD"] %}
+                
+             {% if type =='demande' %}
+             <a href="{{ path('app_demande_demande_new') }}" class="btn btn-main btn-sm"
+                               data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
                 <i class="bi bi-plus-square text-light"></i>
                 Nouveau
             </a>
-            {% endif %} #}
+            {% endif %}
+             
+            {% endif %}
         </div>
     </div>
     <div class="card-body">
         <div class="row">
-      
             <div class="col-sm-12">
-          {#  {{ dump(etat)}} #}
                 {% if permition != null %}
-                <div id="grid_app_demande_demande" class="grid-dt-wrapper">Chargement....</div>
+                <div id="grid_app_directeur_demande_demande" class="grid-dt-wrapper">Chargement....</div>
                 {% else %}
                 <div class="d-flex flex-column flex-center flex-column-fluid">
                     <!--begin::Content-->
@@ -57,15 +59,14 @@
 </div>
 {% endblock %}
 
-
+{% if permition != null %}
 {% block java %}
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
     <script>
- 
         $(function() {
-            $('#grid_app_demande_demande').initDataTables({{ datatable_settings(datatable) }}, {
+            $('#grid_app_directeur_demande_demande').initDataTables({{ datatable_settings(datatable) }}, {
                 searching: true,
-                ajaxUrl: "{{ path('app_demande_demande_index',{'etat':etat}) }}",
+                ajaxUrl: "{{ path('app_directeur_demande_index',{'etat':etat}) }}",
                 language: {
                     url: asset_base_path + "/js/i18n/French.json"
                 }
@@ -73,3 +74,4 @@
         });
     </script>
 {% endblock %}
+{% endif %}

@@ -28,7 +28,7 @@ framework:
           to: demande_valider
         accepatation_president_attente_document:
           from: demande_valider_directeur
-          to: demande_valider_attente_document
+          to: document_enregistre
         document_enregister:
           from: document_enregistre
           to: demande_valider_attente_document

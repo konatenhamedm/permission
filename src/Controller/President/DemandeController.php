@@ -28,74 +28,66 @@ class DemandeController extends BaseController
     const INDEX_ROOT_NAME = "app_president_demande_index";
 
     #[Route('/{etat}/{entreprise}/liste', name: 'app_president_demande_index', methods: ['GET', 'POST'])]
-    public function index(Request $request,string $etat ,string $entreprise,DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, string $etat, string $entreprise, DataTableFactory $dataTableFactory): Response
     {
         if ($etat == 'demande_valider_directeur') {
 
-            $titre ="Demandes en attente d'approbation du président";
-        } elseif($etat == 'demande_valider_attente_document') {
+            $titre = "Demandes en attente d'approbation du président";
+        } elseif ($etat == 'demande_valider_attente_document') {
 
-            $titre ="Demandes en attente de validation documents";
-        }
-        elseif($etat == 'document_enregistre') {
+            $titre = "Demandes en attente de validation documents";
+        } elseif ($etat == 'document_enregistre') {
 
-            $titre ="Demandes ayant besoin de documents pour être clôturer";
-        }
-        elseif($etat == 'demande_valider') {
+            $titre = "Demandes en attente de document pour la  clôture";
+        } elseif ($etat == 'demande_valider') {
 
-            $titre ="Demandes acceptées";
-        }
-        elseif($etat == 'demande_refuser') {
+            $titre = "Demandes acceptées";
+        } elseif ($etat == 'demande_refuser') {
 
-            $titre ="Demandes réfusées";
+            $titre = "Demandes réfusées";
         }
 
 
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), self::INDEX_ROOT_NAME);
 
         $table = $dataTableFactory->create()
-            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut','format' => 'd-m-Y',"searchable"=>true,'globalSearchable'=>true])
-            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin','format' => 'd-m-Y'])
+            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
+            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
             ->add('entreprise', TextColumn::class, ['label' => 'Entreprise', 'field' => 'en.denomination'])
             ->add('prenom', TextColumn::class, ['label' => 'Prenoms', 'field' => 'e.prenom'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Demande::class,
-                'query' => function(QueryBuilder $qb)  use ($etat,$entreprise) {
+                'query' => function (QueryBuilder $qb)  use ($etat, $entreprise) {
                     $qb->select('d,u, e, f, en')
                         ->from(Demande::class, 'd')
                         ->join('d.utilisateur', 'u')
                         ->join('u.employe', 'e')
                         ->join('e.entreprise', 'en')
-                        ->orderBy('d.dateCreation','ASC')
+                        ->orderBy('d.dateCreation', 'ASC')
                         ->join('e.fonction', 'f')
                         ->andWhere('en.denomination =:entreprise')
-                        ->setParameter('entreprise',$entreprise);
-                     
+                        ->setParameter('entreprise', $entreprise);
+
                     if ($etat == 'demande_initie') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_initie");
-                    } elseif($etat == 'demande_valider_directeur') {
+                    } elseif ($etat == 'demande_valider_directeur') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_directeur");
-                    }
-                    elseif($etat == 'demande_valider_attente_document') {
+                    } elseif ($etat == 'demande_valider_attente_document') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_attente_document");
-                    }
-                    elseif($etat == 'document_enregistre') {
+                    } elseif ($etat == 'document_enregistre') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "document_enregistre");
-                    }
-                    elseif($etat == 'demande_valider') {
+                    } elseif ($etat == 'demande_valider') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider");
-                    }
-                    elseif($etat == 'demande_refuser') {
+                    } elseif ($etat == 'demande_refuser') {
                         $qb->andWhere("d.etat =:etat")
-                            ->setParameter('etat', "demande_valider");
+                            ->setParameter('etat', "demande_refuser");
                     }
-
                 }
                 /*->add('numero', TextColumn::class, ['label' => 'Numéro', 'className' => 'w-100px'])
                 ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -114,15 +106,15 @@ class DemandeController extends BaseController
 
                     }*/
             ])
-            ->setName('dt_app_president_demande'.$etat.$entreprise);
-            
+            ->setName('dt_app_president_demande' . $etat . $entreprise);
+
         if ($permission != null) {
 
             $renders = [
-               
-            
 
-                'validation_president' =>  new ActionRender(function () use ($permission,$etat) {
+
+
+                'validation_president' =>  new ActionRender(function () use ($permission, $etat) {
                     if ($permission == 'R') {
                         return false;
                     } elseif ($permission == 'RD') {
@@ -178,16 +170,12 @@ class DemandeController extends BaseController
                             'target' => '#exampleModalSizeLg2',
 
                             'actions' => [
-                               
+
                                 'validation_president' => [
                                     'target' => '#exampleModalSizeSm2',
-                                    'url' => $this->generateUrl('app_demande_demande_edit_workflow_president', ['id' => $value])
-                                    , 'ajax' => true
-                                    , 'icon' => '%icon% bi bi-pen'
-                                    , 'attrs' => ['class' => 'btn-main']
-                                    ,  'render' => $renders['validation_president']
+                                    'url' => $this->generateUrl('app_demande_demande_edit_workflow_president', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-main'],  'render' => $renders['validation_president']
                                 ],
-                                 
+
                                 /* 'show' => [
                                     'target' => '#exampleModalSizeSm2',
                                     'url' => $this->generateUrl('app_demande_demande_show', ['id' => $value])
@@ -198,11 +186,7 @@ class DemandeController extends BaseController
                                 ], */
                                 'shows' => [
                                     'target' => '#exampleModalSizeSm2',
-                                    'url' => $this->generateUrl('app_demande_demande_show_president', ['id' => $value])
-                                    , 'ajax' => true
-                                    , 'icon' => '%icon% bi bi-eye'
-                                    , 'attrs' => ['class' => 'btn-default']
-                                    ,  'render' => $renders['shows']
+                                    'url' => $this->generateUrl('app_demande_demande_show_president', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-eye', 'attrs' => ['class' => 'btn-default'],  'render' => $renders['shows']
                                 ]
                             ]
 
@@ -223,23 +207,23 @@ class DemandeController extends BaseController
         return $this->render('president/demande/index.html.twig', [
             'datatable' => $table,
             'permition' => $permission,
-            'titre'=>$titre,
+            'titre' => $titre,
             'etat' => $etat,
             'entreprise' => $entreprise
         ]);
     }
 
     #[Route('/{id}/edit/workflow_president', name: 'app_demande_demande_edit_workflow_president', methods: ['GET', 'POST'])]
-    public function editWorkflowPresident(Request $request, Demande $demande, DemandeRepository $demandeRepository,MotifRepository $repository, FormError $formError): Response
+    public function editWorkflowPresident(Request $request, Demande $demande, DemandeRepository $demandeRepository, MotifRepository $repository, FormError $formError): Response
     {
-/*dd();*/
+        /*dd();*/
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_demande_demande_edit_workflow_president', [
                 'id' =>  $demande->getId()
             ])
         ]);
-    //    dd($form->getData());
+        //    dd($form->getData());
 
         /*foreach ($form->getData()->getAvis()-as $el){
 
@@ -260,53 +244,46 @@ class DemandeController extends BaseController
             $workflow = $this->workflow->get($demande, 'demande');
 
             if ($form->isValid()) {
-                if ($form->getClickedButton()->getName() === 'accepatation_president'){
+                if ($form->getClickedButton()->getName() === 'accepatation_president') {
                     try {
 
-                     if($workflow->can($demande,'accepatation_president')){
+                        if ($workflow->can($demande, 'accepatation_president')) {
                             $workflow->apply($demande, 'accepatation_president');
                             $this->em->flush();
                         }
-
                     } catch (LogicException $e) {
 
                         $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
                     }
 
                     $demandeRepository->save($demande, true);
-                }elseif($form->getClickedButton()->getName() === 'refuser_president'){
+                } elseif ($form->getClickedButton()->getName() === 'refuser_president') {
                     try {
 
-                        if($workflow->can($demande,'demande_refuser_president')){
-                               $workflow->apply($demande, 'demande_refuser_president');
-                               $this->em->flush();
-                           }
-   
-                       } catch (LogicException $e) {
-   
-                           $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
-                       }
-   
-                       $demandeRepository->save($demande, true);
-                }
-                elseif($form->getClickedButton()->getName()== 'accepatation_president_attente_document'){
-                    if($workflow->can($demande,'accepatation_president_attente_document')){
+                        if ($workflow->can($demande, 'demande_refuser_president')) {
+                            $workflow->apply($demande, 'demande_refuser_president');
+                            $this->em->flush();
+                        }
+                    } catch (LogicException $e) {
+
+                        $this->addFlash('danger', sprintf('No, that did not work: %s', $e->getMessage()));
+                    }
+
+                    $demandeRepository->save($demande, true);
+                } elseif ($form->getClickedButton()->getName() == 'accepatation_president_attente_document') {
+                    if ($workflow->can($demande, 'accepatation_president_attente_document')) {
                         $workflow->apply($demande, 'accepatation_president_attente_document');
                         $this->em->flush();
                     }
                     $demandeRepository->save($demande, true);
-                }
-
-                else{
+                } else {
                     $demandeRepository->save($demande, true);
-                   // return $this->redirect('app_demande_demande_index_avis');
+                    // return $this->redirect('app_demande_demande_index_avis');
                 }
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -314,12 +291,11 @@ class DemandeController extends BaseController
                 if (!$isAjax) {
                     $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -329,9 +305,8 @@ class DemandeController extends BaseController
 
         return $this->renderForm('demande/demande/edit_workflow_president.html.twig', [
             'demande' => $demande,
-           /*  'element' => $repository->findOneBySomeField($demande)[0], */
+            /*  'element' => $repository->findOneBySomeField($demande)[0], */
             'form' => $form,
         ]);
     }
-    
 }

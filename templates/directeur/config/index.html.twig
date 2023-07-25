@@ -59,7 +59,7 @@
   </style>
 {% endblock %}
 {% block body %}
-{% if permition != null %}
+
   <div class="card card-tabs card-custom card-sticky">
     <div class="card-header card-header-stretch card-header-custom">
       <div class="card-toolbar">
@@ -74,8 +74,8 @@
                 <span class="nav-text">
                   {{ module.label }}
                 </span>&nbsp;
-               {% set entreprise = app.user.employe.entreprise.denomination %}
-                <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreDemande(module.etat,entreprise)  }}</span></span>
+               {% set user = app.user %}
+                <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreDemandeByUser(module.etat,user)  }}</span></span>
 
               </a>
             </li>
@@ -102,10 +102,6 @@
     </div>
   </div>
 
-  {% else %}
-    {% include '_includes/page_error.html.twig' %}
-
-  {% endif %}
 
 {% endblock %}
 

@@ -7,15 +7,23 @@ use App\Entity\Entreprise;
 use App\Entity\Fonction;
 use App\Entity\Employe;
 use App\Entity\Service;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 
 class EmployeType extends AbstractType
 {
+    private $user;
+    public function __construct(Security $security)
+    {
+        $this->user = $security->getUser();
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -29,6 +37,13 @@ class EmployeType extends AbstractType
                 'class' => Entreprise::class,
                 'choice_label' => 'denomination',
                 'label' => 'Entreprise',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('e')
+                        ->innerJoin('e.employes', 'em')
+                        ->innerJoin('em.utilisateur', 'u')
+                        ->andWhere('u =:user')
+                        ->setParameter('user', $this->user);
+                },
                 'attr' => ['class' => 'has-select2 form-select']
             ])
             ->add('matricule', null, ['label' => 'Matricule'])
@@ -47,10 +62,7 @@ class EmployeType extends AbstractType
                 'choice_label' => 'libelle',
                 'label' => 'Direction',
                 'attr' => ['class' => 'has-select2 form-select']
-            ])
-            
-            
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

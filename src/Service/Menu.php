@@ -28,55 +28,62 @@ class Menu
     private $tableau = [];
 
 
-    public function __construct(EntityManagerInterface $em, RequestStack $requestStack, RouterInterface $router,Security $security)
+    public function __construct(EntityManagerInterface $em, RequestStack $requestStack, RouterInterface $router, Security $security)
     {
         $this->em = $em;
         if ($requestStack->getCurrentRequest()) {
             $this->route = $requestStack->getCurrentRequest()->attributes->get('_route');
             $this->container = $router->getRouteCollection()->all();
             $this->security = $security;
-
-               
         }
         //foreach($this->container as $key => $value){
 
-          //  if(str_contains($key,'index')){
-             //   $this->tableau [] = [
-                   // $key => str_replace('_',' ',$key)
-              //  ];
-           //}
-            
-     //  }
+        //  if(str_contains($key,'index')){
+        //   $this->tableau [] = [
+        // $key => str_replace('_',' ',$key)
+        //  ];
+        //}
 
-      // dd( $this->tableau);
-      // if($this->getPermission() == null){
-       // dd($this->getPermission());
-      // }
+        //  }
+
+        // dd( $this->tableau);
+        // if($this->getPermission() == null){
+        // dd($this->getPermission());
+        // }
         //dd($this->getPermission());
-       /* if(!$this->getPermission()){
+        /* if(!$this->getPermission()){
             dd("rrrr");
         }*/
         //$this->getPermission();
     }
 
-    public function nombreDemande($etat,$entreprise){
-        $repo = $this->em->getRepository(Demande::class)->nombreDemande($etat,$entreprise);
+    public function nombreDemande($etat, $entreprise)
+    {
+        $repo = $this->em->getRepository(Demande::class)->nombreDemande($etat, $entreprise);
+        return $repo;
+    }
+    public function nombreDemandeByUser($etat, $utilisateur)
+    {
+        $repo = $this->em->getRepository(Demande::class)->nombreDemandeByUser($etat, $utilisateur);
         return $repo;
     }
 
-    public function nombreEmploye($entreprise){
+    public function nombreEmploye($entreprise)
+    {
         $repo = $this->em->getRepository(Employe::class)->nombreEmploye($entreprise);
-       // dd($repo );
+        // dd($repo );
         return $repo;
     }
 
-    public function nombreDemandeStat($etat,$user){
-        $repo = $this->em->getRepository(Demande::class)->nombreDemandeStat($etat,$user);
+    public function nombreDemandeStat($etat, $user)
+    {
+        $repo = $this->em->getRepository(Demande::class)->nombreDemandeStat($etat, $user);
         return $repo;
     }
 
-    public function nombreBroullionStat($etat,$entreprise){
-        $repo = $this->em->getRepository(DemandeBrouillon::class)->nombreBroullionStat($etat,$entreprise);
+    public function nombreBroullionStat($etat, $entreprise)
+    {
+        $repo = $this->em->getRepository(DemandeBrouillon::class)->nombreBroullionStat($etat, $entreprise);
         return $repo;
     }
 
@@ -86,7 +93,7 @@ class Menu
         return $repo;
     }
 
-   
+
 
     public function listeGroupeModule()
     {
@@ -99,37 +106,34 @@ class Menu
     {
         //dd($entreprise);
         $repo = $this->em->getRepository(ConfigApp::class)->findConfig($entreprise);
-      // dd($repo);
+        // dd($repo);
         return $repo;
     }
 
-    public function getTest(){
+    public function getTest()
+    {
         return "#DDAD59";
     }
     public function getPermission()
     {
-        $repo = $this->em->getRepository(ModuleGroupePermition::class)->getPermission($this->security->getUser()->getGroupe()->getId(),$this->route);
-         //dd($repo);
-       if($repo != null){
-            return $repo['code'];
-        }else{
-             return $repo;
-        }
-        
-       
-    }
-
-    public function getPermissionIfDifferentNull($group,$route)
-    {
-        $repo = $this->em->getRepository(ModuleGroupePermition::class)->getPermission($group,$route);
+        $repo = $this->em->getRepository(ModuleGroupePermition::class)->getPermission($this->security->getUser()->getGroupe()->getId(), $this->route);
         //dd($repo);
-        if($repo != null){
+        if ($repo != null) {
             return $repo['code'];
-        }else{
+        } else {
             return $repo;
         }
+    }
 
-
+    public function getPermissionIfDifferentNull($group, $route)
+    {
+        $repo = $this->em->getRepository(ModuleGroupePermition::class)->getPermission($group, $route);
+        //dd($repo);
+        if ($repo != null) {
+            return $repo['code'];
+        } else {
+            return $repo;
+        }
     }
 
     public function liste()
@@ -145,25 +149,25 @@ class Menu
 
         return $repo;
     }
-//public function listeModule
+    //public function listeModule
     public function listeGroupe()
     {
         $array = [
-            'module'=>'modules',
-            'app_config_parametre_index'=>'Parametrage général',
-            'app_utilisateur_groupe_index'=>'Gestion groupe utilisateur',
-            'app_utilisateur_utilisateur_index'=>'Gestion des utilisateur',
-            'app_demande_demande_index'=>'Gestion des demandes',
-            'app_utilisateur_permition_index'=>'Gestion des rôles',
-            'app_utilisateur_employe_index'=>'Gestion des employés',
-            
+            'module' => 'modules',
+            'app_config_parametre_index' => 'Parametrage général',
+            'app_utilisateur_groupe_index' => 'Gestion groupe utilisateur',
+            'app_utilisateur_utilisateur_index' => 'Gestion des utilisateur',
+            'app_demande_demande_index' => 'Gestion des demandes',
+            'app_utilisateur_permition_index' => 'Gestion des rôles',
+            'app_utilisateur_employe_index' => 'Gestion des employés',
+
         ];
 
-        return $array ;
+        return $array;
     }
-//    public function verifyanddispatch() {
-//
-//
-//
-//    }
+    //    public function verifyanddispatch() {
+    //
+    //
+    //
+    //    }
 }

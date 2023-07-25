@@ -28,30 +28,30 @@
              <div class="row">
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Type*</label>
-                {{ form_widget(form.type,{attr:{'readonly':'readonly'}}) }}</div>
+                {{ form_widget(form.type,{attr:{'readonly':'true'}}) }}</div>
                   <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Date debut*</label>
-                {{ form_widget(form.dateDebut) }}</div>
+                {{ form_widget(form.dateDebut,{attr:{'readonly':'true'}}) }}</div>
         </div>
         <div class="row journee">
           
             <div class="form-group col-md-8">
                 <label class="sr-onl" for="userinput1">Date fin*</label>
-                {{ form_widget(form.dateFin) }}</div>
+                {{ form_widget(form.dateFin,{attr:{'readonly':'true'}}) }}</div>
 
             <div class="form-group col-md-4">
                 <label class="sr-onl" for="userinput1">Nombre de jour(inclus)*</label>
-                {{ form_widget(form.nbreJour,{attr:{'readonly':'readonly'}}) }}
+                {{ form_widget(form.nbreJour,{attr:{'readonly':'true'}}) }}
                </div>
 
         </div>
         <div class="row demi">
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Heure debut*</label>
-                {{ form_widget(form.heureDebut) }}</div>
+                {{ form_widget(form.heureDebut,{attr:{'readonly':'true'}}) }}</div>
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Heure Fin*</label>
-                {{ form_widget(form.heureFin) }}</div>
+                {{ form_widget(form.heureFin,{attr:{'readonly':'true'}}) }}</div>
 
 
         </div>
@@ -112,7 +112,9 @@
   
   {{ form_widget(form.annuler) }}
             {{ form_widget(form.document_verification_accepte) }}
+            
              <a title="Refuser le document" href="{{ path('app_demande_demande_rejeter',{'id':demande.id }) }}" class="btn btn-danger btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#exampleModalSizeLg1">Rejeter le document</a>
+             
              {{ form_widget(form.save) }}
           
           

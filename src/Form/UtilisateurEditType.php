@@ -14,14 +14,49 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Security\Core\Security;
 
 class UtilisateurEditType extends AbstractType
 {
+    private $userGroupe;
+    public function __construct(Security $security)
+    {
+        $this->userGroupe = $security->getUser()->getGroupe()->getName();
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        if ($this->userGroupe == 'Présidents') {
+            $builder->add('groupe', EntityType::class, [
+                'label'        => 'Groupe',
+                'choice_label' => 'name',
+                'multiple'     => false,
+                'expanded'     => false,
+                'placeholder' => 'Choisir un groupe',
+                'attr' => ['class' => 'has-select2 element'],
+                'class'        => Groupe::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('e');
+                }
+            ]);
+        } else {
+            $builder->add('groupe', EntityType::class, [
+                'label'        => 'Groupe',
+                'choice_label' => 'name',
+                'multiple'     => false,
+                'expanded'     => false,
+                'placeholder' => 'Choisir un groupe',
+                'attr' => ['class' => 'has-select2 element'],
+                'class'        => Groupe::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('g')
+                        ->andWhere('g.name in (:groupe)')
+                        ->setParameter('groupe', ['Collaborateurs', 'Directeurs']);
+                }
+            ]);
+        }
         $builder
             ->add('username', TextType::class, ['label' => 'Pseudo'])
-            ->add('roles', ChoiceType::class,
+            /*  ->add('roles', ChoiceType::class,
             [
                 'placeholder' => 'Choisir un role',
                 'label' => 'Privilèges Supplémentaires',
@@ -33,8 +68,8 @@ class UtilisateurEditType extends AbstractType
                     'ROLE_SUPER_ADMIN' => 'Super Administrateur',
                     'ROLE_ADMIN' => 'Administrateur'
                 ]),
-            ])
-            ->add('groupes', EntityType::class, [
+            ]) */
+            /*   ->add('groupe', EntityType::class, [
                 'label'        => 'Groupes',
                 'choice_label' => 'name',
                 'multiple'     => true,
@@ -42,8 +77,10 @@ class UtilisateurEditType extends AbstractType
                 'placeholder' => 'Choisir au moins groupe',
                 'attr' => ['class' => 'has-select2'],
                 'class'        => Groupe::class,
-            ])
-            ->add('password', RepeatedType::class, 
+            ]) */
+            ->add(
+                'password',
+                RepeatedType::class,
                 [
                     'type'            => PasswordType::class,
                     'invalid_message' => 'Les mots de passe doivent être identiques.',
@@ -52,16 +89,17 @@ class UtilisateurEditType extends AbstractType
                     'second_options'  => ['label' => 'Répétez le mot de passe'],
                 ]
             )
-            /*->add('employe', EntityType::class,
-            [
-                'class' => Employe::class,
-                'choice_label' => 'nomComplet',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->withoutAccount();
-                }
-            ]
-        )*/
-        ;
+            /*  ->add(
+                'employe',
+                EntityType::class,
+                [
+                    'class' => Employe::class,
+                    'choice_label' => 'nomComplet',
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->withoutAccount();
+                    }
+                ]
+            ) */;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
