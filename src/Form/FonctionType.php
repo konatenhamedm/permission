@@ -6,15 +6,28 @@ use App\Entity\Fonction;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FonctionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('libelle', null, ['label' => 'Libellé'])
-            ->add('code', null, ['label' => 'Code'])
-        ;
+            ->add('libelle', null, [
+                'label' => 'Libellé',
+                'constraints' => [
+                    new NotBlank([
+                        'message' => "S'il vous renseigner le libelle",
+                    ]),
+
+                ],
+            ])
+            ->add('code', null, ['label' => 'Code', 'constraints' => [
+                new NotBlank([
+                    'message' => "S'il vous renseigner le code",
+                ]),
+
+            ],]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

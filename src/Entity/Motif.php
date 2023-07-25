@@ -14,13 +14,14 @@ class Motif
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255,nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $nomEnfant = null;
 
-    #[ORM\Column(length: 255,nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $precisez = null;
 
     #[ORM\ManyToOne(inversedBy: 'motifs')]
+
     private ?ElementMotif $element = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -30,16 +31,16 @@ class Motif
     #[ORM\JoinColumn(nullable: false)]
     private ?Demande $demande = null;
 
-    #[ORM\ManyToOne(cascade:["persist"], fetch:"EAGER")]
+    #[ORM\ManyToOne(cascade: ["persist"], fetch: "EAGER")]
     #[ORM\JoinColumn(nullable: true)]
     private ?Fichier $fichier = null;
 
-    #[ORM\Column(type: Types::TEXT,nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $observation = null;
 
     public function __construct()
     {
-      $this->dateCreation = new \DateTime();
+        $this->dateCreation = new \DateTime();
     }
 
     public function getId(): ?int
@@ -130,6 +131,4 @@ class Motif
 
         return $this;
     }
-
-
 }

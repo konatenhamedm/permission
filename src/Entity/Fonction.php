@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Attribute\Source;
 
 #[ORM\Entity(repositoryClass: FonctionRepository::class)]
-#[ORM\Table(name:'param_fonction')]
+#[ORM\Table(name: 'param_fonction')]
 #[Source]
 class Fonction
 {

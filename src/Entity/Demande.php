@@ -18,17 +18,17 @@ class Demande
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:false)]
-    #[Assert\NotNull(message:"Le champs date debut est requis")]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
+    #[Assert\NotNull(message: "Le champs date debut est requis")]
     private ?\DateTimeInterface $dateDebut = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:true)]
-   
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandes')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Gedmo\Blameable(on:'create')]
+    #[Gedmo\Blameable(on: 'create')]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -37,10 +37,12 @@ class Demande
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
-    #[ORM\OneToMany(mappedBy: 'demande', targetEntity: Motif::class,orphanRemoval: true, cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'demande', targetEntity: Motif::class, orphanRemoval: true, cascade: ['persist'])]
+    #[Assert\NotBlank(message: 'Veuillez renseigner un pseudo')]
     private Collection $motifs;
 
-    #[ORM\Column(length: 255,nullable:true)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Positive(message: 'Nous autorisons pas de valeur négative')]
     private ?string $nbreJour = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandesAvis')]
@@ -49,23 +51,23 @@ class Demande
     #[ORM\ManyToOne(inversedBy: 'demandesAvisPresident')]
     private ?AvisPresident $avisPresident = null;
 
-    #[ORM\Column(length: 255,nullable:true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $justificationDirecteur = null;
 
-    #[ORM\Column(length: 255,nullable:true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $justificationPresident = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotNull(message:"Veillez selectionner un type")]
+    #[Assert\NotNull(message: "Veillez selectionner un type")]
     private ?string $type = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE,nullable:true)]
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $heureDebut = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE,nullable:true)]
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $heureFin = null;
 
-    #[ORM\Column(length: 255,nullable:true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $alerte = null;
 
     #[ORM\OneToMany(mappedBy: 'demande', targetEntity: DemandeBrouillon::class)]
@@ -73,8 +75,8 @@ class Demande
 
     public function __construct()
     {
-              $this->motifs = new ArrayCollection();
-              $this->demandeBrouillons = new ArrayCollection();
+        $this->motifs = new ArrayCollection();
+        $this->demandeBrouillons = new ArrayCollection();
     }
 
     public function getId(): ?int

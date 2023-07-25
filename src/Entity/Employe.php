@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
 class Employe
 {
@@ -18,13 +21,16 @@ class Employe
     private ?int $id = null;
 
     #[ORM\Column(length: 25)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le nom ')]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le prenom')]
     private ?string $prenom = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner la fonction')]
     private ?Fonction $fonction = null;
 
     #[ORM\ManyToOne]
@@ -32,9 +38,11 @@ class Employe
     private ?Civilite $civilite = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le contact')]
     private ?string $contact = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le mail')]
     private ?string $adresseMail = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'], mappedBy: "employe")]
@@ -42,6 +50,7 @@ class Employe
 
 
     #[ORM\Column(length: 12)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le matricule')]
     private ?string $matricule = null;
 
     #[ORM\ManyToOne(inversedBy: 'employes')]
@@ -54,7 +63,6 @@ class Employe
 
     public function __construct()
     {
-
     }
 
 
@@ -139,9 +147,9 @@ class Employe
 
     public function getNomComplet(): ?string
     {
-        return $this->getNom().' '.$this->getPrenom();
+        return $this->getNom() . ' ' . $this->getPrenom();
     }
-    
+
     public function getUtilisateur(): ?Utilisateur
     {
         return $this->utilisateur;
@@ -193,5 +201,4 @@ class Employe
 
         return $this;
     }
-
 }

@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmployeType extends AbstractType
 {
@@ -47,7 +49,25 @@ class EmployeType extends AbstractType
                 'attr' => ['class' => 'has-select2 form-select']
             ])
             ->add('matricule', null, ['label' => 'Matricule'])
-            ->add('contact', null, ['label' => 'Contact(s)'])
+            ->add(
+                'contact',
+                null,
+                [
+                    'label' => 'Contact(s)',
+                    'constraints' => [
+                        /*  new NotBlank([
+                            'message' => 'Please enter a password',
+                        ]), */
+                        new Length([
+                            'min' => 10,
+                            'minMessage' => 'Renseigner au minumum et au maximum {{ limit }} characteres',
+                            // max length allowed by Symfony for security reasons
+                            'max' => 10,
+                        ]),
+                    ],
+                ]
+
+            )
             ->add('adresseMail', EmailType::class, ['label' => 'Adresse E-mail', 'required' => false, 'empty_data' => ''])
             ->add('nom', null, ['label' => 'Nom'])
             ->add('prenom', null, ['label' => 'Prénoms'])

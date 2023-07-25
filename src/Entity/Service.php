@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ServiceRepository::class)]
-#[ORM\Table(name:'param_service')]
+#[ORM\Table(name: 'param_service')]
 class Service
 {
     #[ORM\Id]
@@ -16,7 +16,7 @@ class Service
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 10)]
+    #[ORM\Column(length: 10, unique: true)]
     private ?string $code = null;
 
     #[ORM\Column(length: 255)]
@@ -89,6 +89,4 @@ class Service
 
         return $this;
     }
-
-
 }

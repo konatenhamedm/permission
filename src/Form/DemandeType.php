@@ -6,6 +6,7 @@ use App\Entity\Avis;
 use App\Entity\AvisPresident;
 use App\Entity\Demande;
 use App\Entity\Entreprise;
+use DateTime;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,6 +19,9 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class DemandeType extends AbstractType
 {
@@ -32,17 +36,21 @@ class DemandeType extends AbstractType
     {
 
         $builder
-            ->add('type', ChoiceType::class,
-            [   'placeholder'=>'Choissez un type de mande',
-                'required'     => false,
-                'expanded'     => false,
-                'attr' => ['class' => 'has-select2 type'],
-                'multiple' => false,
-                'choices'  => array_flip([
-                    'TYPE_JOURNEE' => 'Toute la journée',
-                    'TYPE_DEMI_JOURNEE' => 'Demi journée'
-                ]),
-            ])
+            ->add(
+                'type',
+                ChoiceType::class,
+                [
+                    'placeholder' => 'Choissez un type de mande',
+                    'required'     => false,
+                    'expanded'     => false,
+                    'attr' => ['class' => 'has-select2 type'],
+                    'multiple' => false,
+                    'choices'  => array_flip([
+                        'TYPE_JOURNEE' => 'Toute la journée',
+                        'TYPE_DEMI_JOURNEE' => 'Demi journée'
+                    ]),
+                ]
+            )
             ->add('dateDebut', DateType::class, [
                 "required" => false,
                 "widget" => 'single_text',
@@ -57,17 +65,30 @@ class DemandeType extends AbstractType
                 "input_format" => 'Y-m-d',
                 "by_reference" => true,
                 "empty_data" => '',
-                'attr' => ['class' => 'dateFin']
+                'attr' => ['class' => 'dateFin'],
+                'constraints' => [
+                    new NotBlank(),
+
+                    new GreaterThan([
+                        'propertyPath' => 'parent.all[dateDebut].data'
+                    ]),
+                ]
             ])
-            ->add('nbreJour',TextType::class,[
-                'label'=>'Nombre de jour(inclus)',
-                'attr' => ['class' => 'nbre']
+            ->add('nbreJour', TextType::class, [
+                'label' => 'Nombre de jour(inclus)',
+                'attr' => ['class' => 'nbre'],
+                'constraints' => [
+                    new NotNull([
+                        'message' => "S'il vous renseigner le champs nombre de jour",
+                    ]),
+
+                ],
             ])
-            ->add('heureDebut',TimeType::class,[
+            ->add('heureDebut', TimeType::class, [
                 'input'  => 'datetime',
                 'widget' => 'single_text',
             ])
-            ->add('heureFin',TimeType::class,[
+            ->add('heureFin', TimeType::class, [
                 'input'  => 'datetime',
                 'widget' => 'single_text',
             ])
@@ -98,15 +119,15 @@ class DemandeType extends AbstractType
                 'attr' => ['class' => 'has-select2 form-select']
             ])
 
-            ->add('annuler',SubmitType::class,['label' => 'Annuler', 'attr' => ['class' => 'btn btn-primary btn-sm' ,'data-bs-dismiss'=>'modal']])
-            ->add('save',SubmitType::class,['label' => 'Enregister', 'attr' => ['class' => 'btn btn-main btn-ajax btn-sm']])
-            ->add('passer',SubmitType::class,['label' => 'Valider etape', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('refuser',SubmitType::class,['label' => 'Réfuser la demande', 'attr' => ['class' => 'btn btn-danger btn-ajax btn-sm']])
-            ->add('accepatation_president',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-warning btn-ajax btn-sm']])
-            ->add('accepatation_president_attente_document',SubmitType::class,['label' => 'Accepte et attente document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('document_enregister',SubmitType::class,['label' => 'Soumettre le document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('document_verification_accepte',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-primary btn-ajax btn-sm']])
-            ->add('document_verification_refuse',SubmitType::class,['label' => 'Rejeter le document', 'attr' => ['class' => 'btn btn-primary btn-ajax btn-sm']])
+            ->add('annuler', SubmitType::class, ['label' => 'Annuler', 'attr' => ['class' => 'btn btn-primary btn-sm', 'data-bs-dismiss' => 'modal']])
+            ->add('save', SubmitType::class, ['label' => 'Enregister', 'attr' => ['class' => 'btn btn-main btn-ajax btn-sm']])
+            ->add('passer', SubmitType::class, ['label' => 'Valider etape', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            ->add('refuser', SubmitType::class, ['label' => 'Réfuser la demande', 'attr' => ['class' => 'btn btn-danger btn-ajax btn-sm']])
+            ->add('accepatation_president', SubmitType::class, ['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-warning btn-ajax btn-sm']])
+            ->add('accepatation_president_attente_document', SubmitType::class, ['label' => 'Accepte et attente document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            ->add('document_enregister', SubmitType::class, ['label' => 'Soumettre le document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            ->add('document_verification_accepte', SubmitType::class, ['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-primary btn-ajax btn-sm']])
+            ->add('document_verification_refuse', SubmitType::class, ['label' => 'Rejeter le document', 'attr' => ['class' => 'btn btn-primary btn-ajax btn-sm']])
 
             /*->add('avis', CollectionType::class, [
                 'entry_type' => AvisType::class,
@@ -119,8 +140,7 @@ class DemandeType extends AbstractType
                 'allow_delete' => true,
                 'prototype' => true,
             ])*/
-            /*->add('utilisateur')*/
-        ;
+            /*->add('utilisateur')*/;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
