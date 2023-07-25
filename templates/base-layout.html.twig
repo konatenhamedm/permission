@@ -1010,7 +1010,17 @@ License: For each use you must have a valid license purchased only from above li
 										<!--begin::Menu wrapper-->
 										<div class="topbar-item px-3 px-lg-5 position-relative" id="kt_drawer_chat_toggle">
 											<i class="bi bi-chat-left-text fs-3"></i>
+
+											{% if(app.user.groupe.name in ['Directeurs','Présidents']) %}
+												{% if(menu.getAllDemandeByEntreprise(null,app.user.employe.entreprise.denomination) > 0) %}
 											<span class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 mt-4 start-50 animation-blink"></span>
+											{% endif %}
+											{% else %}
+										{% if(menu.getAllDemandeByEntreprise(app.user,app.user.employe.entreprise.denomination) > 0) %}
+											<span class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 mt-4 start-50 animation-blink"></span>
+											{% endif %}
+											{% endif %}
+											
 										</div>
 										<!--end::Menu wrapper-->
 									</div>

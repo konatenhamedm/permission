@@ -34,7 +34,26 @@ class DemandeSimpleController extends BaseController
     #[Route('/{etat}/liste/avis', name: 'app_demande_demande_avis_ls', methods: ['GET', 'POST'])]
     public function listeavis(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
     {
-        //dd('ff');
+        if ($etat == 'demande_initie') {
+
+            $titre = "Demande en attente approbation";
+        } elseif ($etat == 'demande_valider_directeur') {
+
+            $titre = "Demandes en attente d'approbation du président";
+        } elseif ($etat == 'demande_valider_attente_document') {
+
+            $titre = "Demande en attente de validation de documents";
+        } elseif ($etat == 'document_enregistre') {
+
+
+            $titre = "Demande en attente de document pour être clôturée";
+        } elseif ($etat == 'demande_valider') {
+
+            $titre = "Demandes acceptées";
+        } elseif ($etat == 'demande_refuser') {
+
+            $titre = "Demandes réfusées";
+        }
         $table = $dataTableFactory->create()
             ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
             /* ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y']) */
@@ -83,22 +102,7 @@ class DemandeSimpleController extends BaseController
                             ->setParameter('etat', "demande_valider");
                     }
                 }
-                /*->add('numero', TextColumn::class, ['label' => 'Numéro', 'className' => 'w-100px'])
-                ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
-                ->createAdapter(ORMAdapter::class, [
-                    'entity' => Offre::class,
-                    'query' => function (QueryBuilder $qb) use ($etat) {
-                        $qb->select('offre')
-                            ->from(Offre::class, 'offre');
 
-
-                        if ($etat == 'non_attribue') {
-                            $qb->andWhere('offre.attribue = 0');
-                        } else {
-                            $qb->andWhere('offre.attribue = 1');
-                        }
-
-                    }*/
             ])
             ->setName('dt_app_demande_demande_avis_' . $etat);
 
@@ -205,7 +209,8 @@ class DemandeSimpleController extends BaseController
 
         return $this->render('demande/demande/liste_avis.html.twig', [
             'datatable' => $table,
-            'etat' => $etat
+            'etat' => $etat,
+            'titre' => $titre
         ]);
     }
 

@@ -255,7 +255,7 @@ class DemandeController extends BaseController
         } elseif ($etat == 'document_enregistre') {
 
 
-            $titre = "Demande en attente de document pour clôturer";
+            $titre = "Demande en attente de document pour être clôturée";
         } elseif ($etat == 'demande_valider') {
 
             $titre = "Demandes acceptées";

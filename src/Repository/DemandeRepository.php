@@ -104,6 +104,35 @@ class DemandeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function getAllDemandeByEntreprise($user, $entreprise)
+    {
+        if ($user != null) {
+            return $this->createQueryBuilder('d')
+                ->select('count(d.id)')
+                ->join('d.utilisateur', 'u')
+                ->join('u.employe', 'e')
+                ->join('e.entreprise', 'en')
+                ->andWhere('d.etat in (:etat)')
+                ->andWhere('u =:user')
+                ->setParameter('etat', ['document_enregistre'])
+                ->setParameter('user', $user)
+                ->getQuery()
+                ->getSingleScalarResult();
+        } else {
+            return $this->createQueryBuilder('d')
+                ->select('count(d.id)')
+                ->join('d.utilisateur', 'u')
+                ->join('u.employe', 'e')
+                ->join('e.entreprise', 'en')
+                ->andWhere('d.etat in (:etat)')
+                ->andWhere('en.denomination =:entreprise')
+                ->setParameter('etat', ['demande_initie', 'demande_valider_attente_document'])
+                ->setParameter('entreprise', $entreprise)
+                ->getQuery()
+                ->getSingleScalarResult();
+        }
+    }
     public function countAll(array $filters = [])
     {
         $em = $this->getEntityManager();
