@@ -75,7 +75,17 @@
                   {{ module.label }}
                 </span>&nbsp;
                {% set user = app.user %}
-                <span class="menu-badge" ><span class="badge badge-success" >{{ menu.nombreDemandeByUser(module.etat,user)  }}</span></span>
+              
+                <span class="menu-badge" ><span class="badge badge-success" >
+                {% if app.user.groupe.name == 'Collaborateurs' %}
+                {{ menu.nombreDemandeByUser(module.etat,user)  }}
+                  
+                {% else %}
+                {{ menu.nombreDemandeByEntreprise(module.etat,user.employe.entreprise)  }}
+                  
+                {% endif %}
+                
+                </span></span>
 
               </a>
             </li>

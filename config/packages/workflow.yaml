@@ -16,7 +16,7 @@ framework:
         - demande_valider_president
         - demande_valider_attente_document
         - demande_valider
-        - document_enregistre
+        - document_soumis_directeur
         - document_accepte
         - demande_refuser
       transitions:
@@ -28,16 +28,16 @@ framework:
           to: demande_valider
         accepatation_president_attente_document:
           from: demande_valider_directeur
-          to: document_enregistre
-        document_enregister:
-          from: document_enregistre
           to: demande_valider_attente_document
-        document_verification_accepte:
+        document_enregister:
           from: demande_valider_attente_document
+          to: document_soumis_directeur
+        document_verification_accepte:
+          from: document_soumis_directeur
           to: demande_valider
         document_verification_refuse:
-          from: demande_valider_attente_document
-          to: document_enregistre
+          from: document_soumis_directeur
+          to: demande_valider_attente_document
         demande_refuser:
           from: demande_initie
           to: demande_refuser

@@ -132,8 +132,13 @@
     </div>
     <div class="modal-footer">
      {{ form_widget(form.annuler) }}
+     
+       {% if app.user.groupe.name == 'Collaborateurs' %}
         {{ form_widget(form.save) }}
         {{ form_widget(form.document_enregister) }}
+       
+       {% endif %}
+       
         
    </div>
     {{ form_widget(form._token) }}

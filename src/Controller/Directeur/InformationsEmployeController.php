@@ -34,80 +34,74 @@ class InformationsEmployeController extends BaseController
 
 
     #[Route('/{entreprise}', name: 'app_utilisateur_employe_infos_index', methods: ['GET', 'POST'])]
-    public function index(Request $request,string $entreprise, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, string $entreprise, DataTableFactory $dataTableFactory): Response
     {
         $groupeName = $this->security->getUser()->getGroupe()->getName();
-        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-//dd($permission);
+        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), self::INDEX_ROOT_NAME);
+        //dd($permission);
         $table = $dataTableFactory->create()
-        ->add('matricule', TextColumn::class, ['label' => 'Matricule'])
-        ->add('civilite', TextColumn::class, ['field' => 'civilite.code', 'label' => 'Civilité'])
-        ->add('nom', TextColumn::class, ['label' => 'Nom'])
-        ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])
-        ->add('adresseMail', TextColumn::class, ['label' => 'Email'])
-        ->add('fonction', TextColumn::class, ['field' => 'fonction.libelle', 'label' => 'Fonction'])
-        ->createAdapter(ORMAdapter::class, [
-            'entity' => Employe::class,
-            'query' => function(QueryBuilder $qb) use ($entreprise){
-                $qb->select('e, civilite, fonction')
-                    ->from(Employe::class, 'e')
-                    ->join('e.civilite', 'civilite')
-                    ->join('e.fonction', 'fonction')
-                    ->join('e.entreprise', 'entreprise')
-                    /*->andWhere('entreprise.code = :entreprise')*/
-
-                ;
-                if($this->security->getUser()->getGroupe()->getName() != "Présidents"){
-                    $qb->andWhere('entreprise.code = :entreprise')
-                        ->setParameter('user',$this->security->getUser()->getEmploye()->getEntreprise()->getCode());
-                }else{
-                    $qb->andWhere('entreprise.code = :entreprise')
-                        ->setParameter('entreprise',$entreprise);
+            ->add('matricule', TextColumn::class, ['label' => 'Matricule'])
+            ->add('civilite', TextColumn::class, ['field' => 'civilite.code', 'label' => 'Civilité'])
+            ->add('nom', TextColumn::class, ['label' => 'Nom'])
+            ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])
+            ->add('adresseMail', TextColumn::class, ['label' => 'Email'])
+            ->add('fonction', TextColumn::class, ['field' => 'fonction.libelle', 'label' => 'Fonction'])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Employe::class,
+                'query' => function (QueryBuilder $qb) use ($entreprise) {
+                    $qb->select('e, civilite, fonction,entreprise')
+                        ->from(Employe::class, 'e')
+                        ->join('e.civilite', 'civilite')
+                        ->join('e.fonction', 'fonction')
+                        ->join('e.entreprise', 'entreprise')
+                        /*->andWhere('entreprise.code = :entreprise')*/;
+                    if ($this->security->getUser()->getGroupe()->getName() != "Présidents") {
+                        $qb->andWhere('entreprise.code = :entreprise')
+                            ->setParameter('user', $this->security->getUser()->getEmploye()->getEntreprise()->getCode());
+                    } else {
+                        $qb->andWhere('entreprise.code = :entreprise')
+                            ->setParameter('entreprise', $entreprise);
+                    }
                 }
-                
-            }
-        ])
-        ->setName('dt_app_utilisateur_employe_infos'.$entreprise);
-        if($permission != null){
+            ])
+            ->setName('dt_app_utilisateur_employe_infos' . $entreprise);
+        if ($permission != null) {
             $renders = [
                 'stat_general' =>  new ActionRender(function () use ($permission) {
-                    if($permission == 'R'){
+                    if ($permission == 'R') {
                         return true;
-                    }elseif($permission == 'RD'){
+                    } elseif ($permission == 'RD') {
                         return true;
-                    }elseif($permission == 'RU'){
+                    } elseif ($permission == 'RU') {
                         return true;
-                    }elseif($permission == 'RUD'){
+                    } elseif ($permission == 'RUD') {
                         return true;
-                    }elseif($permission == 'CRU'){
+                    } elseif ($permission == 'CRU') {
+                        return true;
+                    } elseif ($permission == 'CR') {
+                        return true;
+                    } else {
                         return true;
                     }
-                    elseif($permission == 'CR'){
-                        return true;
-                    }else{
-                        return true;
-                    }
-
                 }),
                 'stat_simple' => new ActionRender(function () use ($permission) {
-                    if($permission == 'R'){
+                    if ($permission == 'R') {
                         return true;
-                    }elseif($permission == 'RD'){
+                    } elseif ($permission == 'RD') {
                         return true;
-                    }elseif($permission == 'RU'){
+                    } elseif ($permission == 'RU') {
                         return true;
-                    }elseif($permission == 'RUD'){
+                    } elseif ($permission == 'RUD') {
                         return true;
-                    }elseif($permission == 'CRU'){
+                    } elseif ($permission == 'CRU') {
                         return true;
-                    }
-                    elseif($permission == 'CR'){
+                    } elseif ($permission == 'CR') {
                         return true;
-                    }else{
+                    } else {
                         return true;
                     }
                 }),
-          
+
 
             ];
 
@@ -122,17 +116,13 @@ class InformationsEmployeController extends BaseController
 
             if ($hasActions) {
                 $table->add('id', TextColumn::class, [
-                    'label' => 'Actions'
-                    , 'orderable' => false
-                    ,'globalSearchable' => false
-                    ,'className' => 'grid_row_actions'
-                    , 'render' => function ($value, Employe $context) use ($renders) {
+                    'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Employe $context) use ($renders) {
                         $options = [
                             'default_class' => 'btn btn-xs btn-clean btn-icon mr-2 ',
                             'target' => '#exampleModalSizeLg2',
 
                             'actions' => [
-                              /*   'stat_general' => [
+                                /*   'stat_general' => [
                                     'target'=>'#exampleModalSizeSm2',
                                     'url' => $this->generateUrl('app_utilisateur_employe_infos_stats_generales', ['id' => $value])
                                     , 'ajax' => true
@@ -141,14 +131,10 @@ class InformationsEmployeController extends BaseController
                                     , 'render' => $renders['stat_general']
                                 ], */
                                 'stat_simple' => [
-                                    'target'=>'#exampleModalSizeSm2',
-                                    'url' => $this->generateUrl('app_utilisateur_employe_infos_stats_simples', ['id' => $value])
-                                    , 'ajax' => true
-                                    , 'icon' => '%icon% bi bi-eye'
-                                    , 'attrs' => ['class' => 'btn-primary']
-                                    , 'render' => $renders['stat_simple']
+                                    'target' => '#exampleModalSizeSm2',
+                                    'url' => $this->generateUrl('app_utilisateur_employe_infos_stats_simples', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-eye', 'attrs' => ['class' => 'btn-primary'], 'render' => $renders['stat_simple']
                                 ],
-                              
+
                             ]
 
                         ];
@@ -165,21 +151,20 @@ class InformationsEmployeController extends BaseController
             return $table->getResponse();
         }
 
-       if($groupeName == "Présidents"){
-        return $this->render('directeur/demande/infos/index_president.html.twig', [
-                    'datatable' => $table,
-                    'permition' => $permission,
-                   'entreprise'=>$entreprise,
-                   
-                ]);
-       }else{
-        return $this->render('directeur/demande/infos/index_directeur.html.twig', [
-            'datatable' => $table,
-            'permition' => $permission,
-            
-        ]);
-       }
-       
+        if ($groupeName == "Présidents") {
+            return $this->render('directeur/demande/infos/index_president.html.twig', [
+                'datatable' => $table,
+                'permition' => $permission,
+                'entreprise' => $entreprise,
+
+            ]);
+        } else {
+            return $this->render('directeur/demande/infos/index_directeur.html.twig', [
+                'datatable' => $table,
+                'permition' => $permission,
+
+            ]);
+        }
     }
 
 
@@ -187,8 +172,8 @@ class InformationsEmployeController extends BaseController
     public function indexDirecteur(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $groupeName = $this->security->getUser()->getGroupe()->getName();
-        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-//dd($permission);
+        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), self::INDEX_ROOT_NAME);
+        //dd($permission);
         $table = $dataTableFactory->create()
             ->add('matricule', TextColumn::class, ['label' => 'Matricule'])
             ->add('civilite', TextColumn::class, ['field' => 'civilite.code', 'label' => 'Civilité'])
@@ -198,60 +183,53 @@ class InformationsEmployeController extends BaseController
             ->add('fonction', TextColumn::class, ['field' => 'fonction.libelle', 'label' => 'Fonction'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Employe::class,
-                'query' => function(QueryBuilder $qb) {
+                'query' => function (QueryBuilder $qb) {
                     $qb->select('e, civilite, fonction')
                         ->from(Employe::class, 'e')
                         ->join('e.civilite', 'civilite')
                         ->join('e.fonction', 'fonction')
                         ->join('e.entreprise', 'entreprise')
-                        /*->andWhere('entreprise.code = :entreprise')*/
-
-                    ;
-                    if($this->security->getUser()->getGroupe()->getName() != "Présidents"){
+                        /*->andWhere('entreprise.code = :entreprise')*/;
+                    if ($this->security->getUser()->getGroupe()->getName() != "Présidents") {
                         $qb->andWhere('entreprise.code = :entreprise')
-                            ->setParameter('entreprise',$this->security->getUser()->getEmploye()->getEntreprise()->getCode());
-                   
-                        }
-
+                            ->setParameter('entreprise', $this->security->getUser()->getEmploye()->getEntreprise()->getCode());
+                    }
                 }
             ])
             ->setName('dt_app_utilisateur_employe_infos_directeur');
-        if($permission != null){
+        if ($permission != null) {
             $renders = [
                 'stat_general' =>  new ActionRender(function () use ($permission) {
-                    if($permission == 'R'){
+                    if ($permission == 'R') {
                         return true;
-                    }elseif($permission == 'RD'){
+                    } elseif ($permission == 'RD') {
                         return true;
-                    }elseif($permission == 'RU'){
+                    } elseif ($permission == 'RU') {
                         return true;
-                    }elseif($permission == 'RUD'){
+                    } elseif ($permission == 'RUD') {
                         return true;
-                    }elseif($permission == 'CRU'){
+                    } elseif ($permission == 'CRU') {
+                        return true;
+                    } elseif ($permission == 'CR') {
+                        return true;
+                    } else {
                         return true;
                     }
-                    elseif($permission == 'CR'){
-                        return true;
-                    }else{
-                        return true;
-                    }
-
                 }),
                 'stat_simple' => new ActionRender(function () use ($permission) {
-                    if($permission == 'R'){
+                    if ($permission == 'R') {
                         return true;
-                    }elseif($permission == 'RD'){
+                    } elseif ($permission == 'RD') {
                         return true;
-                    }elseif($permission == 'RU'){
+                    } elseif ($permission == 'RU') {
                         return true;
-                    }elseif($permission == 'RUD'){
+                    } elseif ($permission == 'RUD') {
                         return true;
-                    }elseif($permission == 'CRU'){
+                    } elseif ($permission == 'CRU') {
                         return true;
-                    }
-                    elseif($permission == 'CR'){
+                    } elseif ($permission == 'CR') {
                         return true;
-                    }else{
+                    } else {
                         return true;
                     }
                 }),
@@ -270,11 +248,7 @@ class InformationsEmployeController extends BaseController
 
             if ($hasActions) {
                 $table->add('id', TextColumn::class, [
-                    'label' => 'Actions'
-                    , 'orderable' => false
-                    ,'globalSearchable' => false
-                    ,'className' => 'grid_row_actions'
-                    , 'render' => function ($value, Employe $context) use ($renders) {
+                    'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Employe $context) use ($renders) {
                         $options = [
                             'default_class' => 'btn btn-xs btn-clean btn-icon mr-2 ',
                             'target' => '#exampleModalSizeLg2',
@@ -289,12 +263,8 @@ class InformationsEmployeController extends BaseController
                                       , 'render' => $renders['stat_general']
                                   ], */
                                 'stat_simple' => [
-                                    'target'=>'#exampleModalSizeSm2',
-                                    'url' => $this->generateUrl('app_utilisateur_employe_infos_stats_simples', ['id' => $value])
-                                    , 'ajax' => true
-                                    , 'icon' => '%icon% bi bi-eye'
-                                    , 'attrs' => ['class' => 'btn-primary']
-                                    , 'render' => $renders['stat_simple']
+                                    'target' => '#exampleModalSizeSm2',
+                                    'url' => $this->generateUrl('app_utilisateur_employe_infos_stats_simples', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-eye', 'attrs' => ['class' => 'btn-primary'], 'render' => $renders['stat_simple']
                                 ],
 
                             ]
@@ -313,25 +283,24 @@ class InformationsEmployeController extends BaseController
             return $table->getResponse();
         }
 
-        if($groupeName == "Présidents"){
+        if ($groupeName == "Présidents") {
             return $this->render('directeur/demande/infos/index_president.html.twig', [
                 'datatable' => $table,
                 'permition' => $permission,
                 //'entreprise'=>$entreprise,
 
             ]);
-        }else{
+        } else {
             return $this->render('directeur/demande/infos/index_directeur.html.twig', [
                 'datatable' => $table,
                 'permition' => $permission,
 
             ]);
         }
-
     }
 
     #[Route('/{id}/generale', name: 'app_utilisateur_employe_infos_stats_generales', methods: ['GET'])]
-    public function statsGenerales(Employe $employe,DemandeRepository $demandeRepository): Response
+    public function statsGenerales(Employe $employe, DemandeRepository $demandeRepository): Response
     {
         $data = $demandeRepository->getAnnee();
         $dataFin = $demandeRepository->getAnneeFin();
@@ -373,27 +342,26 @@ class InformationsEmployeController extends BaseController
 
         return $this->renderForm('directeur/demande/infos/stats_generale.html.twig', [
             'form' => $form,
-            'employe'=>$employe
+            'employe' => $employe
         ]);
     }
 
     #[Route('/{id}/simple', name: 'app_utilisateur_employe_infos_stats_simples', methods: ['GET'])]
-    public function statsSimple(Employe $employe,DemandeRepository $demandeRepository): Response
+    public function statsSimple(Employe $employe, DemandeRepository $demandeRepository): Response
     {
         $data = $demandeRepository->getAnnee();
         $mois = $demandeRepository->getMois();
-      // dd($data);
+        // dd($data);
         $annees = [];
         $dataMois = [];
         foreach ($data as $value) {
             $annees[$value['dateDebut']] =  $value['dateDebut'];
         }
-        
+
         foreach ($mois as $value) {
-          
-                $dataMois[$value['mois']] =  $value['mois'];
-          
-        }//dd($annees);
+
+            $dataMois[$value['mois']] =  $value['mois'];
+        } //dd($annees);
         // dd($anneesFin);
 
         $formBuilder = $this->createFormBuilder()
@@ -434,13 +402,13 @@ class InformationsEmployeController extends BaseController
         $form = $formBuilder->getForm();
         return $this->renderForm('directeur/demande/infos/stats_simple.html.twig', [
             'form' => $form,
-            'employe'=>$employe
+            'employe' => $employe
         ]);
     }
 
 
 
-    #[Route('/courbe/detail/employe', name: 'app_president_courbe_details_employe',condition: "request.query.has('filters')")]
+    #[Route('/courbe/detail/employe', name: 'app_president_courbe_details_employe', condition: "request.query.has('filters')")]
     public function apiGetDetailsEmploye(Request $request, EmployeRepository $employeRepository, EntrepriseRepository $entrepriseRepository)
     {
         $all = $request->query->all();
@@ -451,44 +419,44 @@ class InformationsEmployeController extends BaseController
         //$mois = $filters['mois'];
 
         //dd($date,$employe);
-        $dataDemande = $employeRepository->getNombreDemandeParMois($date,$employe,null);
+        $dataDemande = $employeRepository->getNombreDemandeParMois($date, $employe, null);
         //$dataRefuse = $employeRepository->getNombreDemandeParMois($date,$employe,"demande_refuser");
-      // $data = $employeRepository->getNombreDemandeParMois($mois,$employe,"non null");
-       //dd($data);
+        // $data = $employeRepository->getNombreDemandeParMois($mois,$employe,"non null");
+        //dd($data);
 
         $moisDemande = [];
         $jour = [];
         $nombreDemande = [];
         $nombreDemandedata = [];
-        
+
 
         foreach ($dataDemande as $element) {
             $moisDemande[] = $element['mois'];
             $nombreDemande[] = $element['_total'];
         }
 
-       /*  foreach ($data as $element) {
+        /*  foreach ($data as $element) {
             $jour[] = $element['jour'];
             $nombreDemandedata[] = $element['nbre_jour'];
            
         } */
-      
-       /*  if($nombreDemandeRefuse == null){
+
+        /*  if($nombreDemandeRefuse == null){
             $nombreDemandeRefuse [] = 0; 
         }
         if($nombreDemandeAccepte == null){
             $nombreDemandeAccepte [] = 0; 
         }
          */
-      //dd();
+        //dd();
         $seriesDemande = [
             [
-                "colorByPoint"=> "true",
+                "colorByPoint" => "true",
                 "data" => $nombreDemande,
             ]
         ];
 
-       /*  $seriesDemandeJour= [
+        /*  $seriesDemandeJour= [
             [
                 "name" => "Demande par jour du mois",
                 "marker" => [
@@ -498,20 +466,19 @@ class InformationsEmployeController extends BaseController
                 ]
         ];
  */
-      
 
-     
-///dd(array_unique(array_merge($moisDemandeA,$moisDemandeR)));
-       // dd(array_sum($seriesDemandeAccepte),$employe);
-      // dd($this->json(['dataFusion' => $seriesDemandeJour]));
+
+
+        ///dd(array_unique(array_merge($moisDemandeA,$moisDemandeR)));
+        // dd(array_sum($seriesDemandeAccepte),$employe);
+        // dd($this->json(['dataFusion' => $seriesDemandeJour]));
 
 
         return $this->json([
-            'seriesDemande' => $seriesDemande, 
+            'seriesDemande' => $seriesDemande,
             //'dataFusion' => $seriesDemandeJour, 
-            'jour' =>$jour, 
-            'moisDemande' => $moisDemande]);
+            'jour' => $jour,
+            'moisDemande' => $moisDemande
+        ]);
     }
-   
-
 }

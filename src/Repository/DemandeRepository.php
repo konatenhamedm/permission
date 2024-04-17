@@ -104,6 +104,22 @@ class DemandeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+    public function nombreDemandeByEntreprise($etat, $entreprise)
+    {
+        return $this->createQueryBuilder('d')
+            ->select('count(d.id)')
+            ->join('d.utilisateur', 'u')
+            ->join('u.employe', 'e')
+            ->join('e.entreprise', 'en')
+            ->orderBy('d.dateCreation', 'ASC')
+            ->join('e.fonction', 'f')
+            ->andWhere('en =:entreprise')
+            ->andWhere("d.etat =:etat")
+            ->setParameter('etat', $etat)
+            ->setParameter('entreprise', $entreprise)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
     public function getAllDemandeByEntreprise($user, $entreprise)
     {

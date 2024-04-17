@@ -55,6 +55,7 @@ class DemandeSimpleController extends BaseController
             $titre = "Demandes réfusées";
         }
         $table = $dataTableFactory->create()
+            ->add('dateCreation', DateTimeColumn::class, ['label' => 'Date demande', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
             ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
             /* ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y']) */
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
@@ -417,7 +418,15 @@ class DemandeSimpleController extends BaseController
         ]);
 
 
-        return $this->renderForm('demande/demande/shows.html.twig', [
+        if ($this->security->getUser()->getGroupe()->getName() == "Présidents") {
+            $template = 'show_president';
+        } elseif ($this->security->getUser()->getGroupe()->getName() == "Collaborateurs") {
+            $template = 'show_collaborateur';
+        } else {
+            $template = 'show_directeur';
+        }
+
+        return $this->renderForm('demande/demande/shows/' . $template . '.html.twig', [
             'demande' => $demande,
             'form' => $form,
             'documents' => $motifRepository->getDocumentCourrier($demande),
@@ -728,7 +737,7 @@ class DemandeSimpleController extends BaseController
     #[Route('/{id}/edit/workflow_verification', name: 'app_demande_demande_edit_workflow_verification', methods: ['GET', 'POST'])]
     public function editWorkflowVerification(Request $request, FichierRepository $fichierRepository, Demande $demande, DemandeRepository $demandeRepository, MotifRepository $repository, FormError $formError): Response
     {
-        //dd();
+        //dd('ghgg');
         $form = $this->createForm(DemandeWorkflowType::class, $demande, [
             'method' => 'POST',
             'doc_options' => [
@@ -802,6 +811,7 @@ class DemandeSimpleController extends BaseController
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
+
                 $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);

@@ -18,8 +18,8 @@ class AvisConfigPresidentController extends BaseController
     #[Route(path: '/', name: 'app_config_avis_president_index', methods: ['GET', 'POST'])]
     public function index(Request $request, Breadcrumb $breadcrumb): Response
     {
-        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(),self::INDEX_ROOT_NAME);
-      
+        $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), self::INDEX_ROOT_NAME);
+
         $modules = [
             [
                 'label' => "Approbation directeur",
@@ -48,8 +48,7 @@ class AvisConfigPresidentController extends BaseController
                 'role' => 'ROLE_ALL',
                 'name' => 'demande_t',
                 'href' => $this->generateUrl('app_config_president_ls', ['module' => 'demande_t'])
-            ]
-            ,
+            ],
             [
                 'label' => 'Demandes réfusées',
                 'icon' => 'bi bi-people',
@@ -64,7 +63,7 @@ class AvisConfigPresidentController extends BaseController
                 'name' => 'infos',
                 'href' => $this->generateUrl('app_config_president_ls', ['module' => 'infos'])
             ],
-           
+
         ];
 
         $breadcrumb->addItem([
@@ -81,7 +80,7 @@ class AvisConfigPresidentController extends BaseController
             'modules' => $modules,
             'module_name' => self::MODULE_NAME,
             'breadcrumb' => $breadcrumb,
-            'permition'=>$permission
+            'permition' => $permission
         ]);
     }
 
@@ -98,229 +97,229 @@ class AvisConfigPresidentController extends BaseController
             'approbation_dir' => [
                 [
                     'label' => 'Suzang group ',
-                    'affiche_total'=>'true',
-                    'etat'=>'demande_valider_directeur',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_suzang',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_directeur','entreprise' => 'suzang group'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_directeur', 'entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider_directeur',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_appatam',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_directeur','entreprise' => 'appatam'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_directeur', 'entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
-                    'affiche_total'=>'true',
-                    'etat'=>'demande_valider_directeur',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_directeur',
                     'id' => 'param_validation_demande_socopi',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_directeur','entreprise' => 'socopi'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_directeur', 'entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider_directeur',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_djela',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_directeur','entreprise' => 'djela'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_directeur', 'entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider_directeur',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_directeur',
                     'id' => 'demande_valider_directeur_yefien',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_directeur','entreprise' => 'yefien'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_directeur', 'entreprise' => 'yefien'])
                 ],
             ],
 
             'approbation_pr' => [
                 [
                     'label' => 'suzang group',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider_attente_document',
+                    'affiche_total' => 'true',
+                    'etat' => 'document_soumis_directeur',
                     'id' => 'param_initie_demande_su',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_attente_document','entreprise' => 'suzang group'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'document_soumis_directeur', 'entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
-                     'affiche_total'=>'true',
-                     'etat'=>'demande_valider_attente_document',
+                    'affiche_total' => 'true',
+                    'etat' => 'document_soumis_directeur',
                     'id' => 'param_initie_demande_appatam',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_attente_document','entreprise' => 'appatam'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'document_soumis_directeur', 'entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
-                     'affiche_total'=>'true',
-                     'etat'=>'demande_valider_attente_document',
+                    'affiche_total' => 'true',
+                    'etat' => 'document_soumis_directeur',
                     'id' => 'param_validation_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_attente_document','entreprise' => 'socopi'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'document_soumis_directeur', 'entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
-                     'affiche_total'=>'true',
-                     'etat'=>'demande_valider_attente_document',
+                    'affiche_total' => 'true',
+                    'etat' => 'document_soumis_directeur',
                     'id' => 'param_livraison_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat' =>'demande_valider_attente_document','entreprise' => 'djela'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'document_soumis_directeur', 'entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
-                     'affiche_total'=>'true',
-                     'etat'=>'demande_valider_attente_document',
+                    'affiche_total' => 'true',
+                    'etat' => 'document_soumis_directeur',
                     'id' => 'param_livrer_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider_attente_document','entreprise' => 'yefien'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'document_soumis_directeur', 'entreprise' => 'yefien'])
                 ],
             ],
 
             'document' => [
                 [
                     'label' => 'suzang group',
-                     'affiche_total'=>'true',
-                    'etat'=>'document_enregistre',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_attente_document',
                     'id' => 'param_initie_demande_su',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'suzang group'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_attente_document', 'entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
-                     'affiche_total'=>'true',
-                     'etat'=>'document_enregistre',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_attente_document',
                     'id' => 'param_initie_demande_appatam',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'appatam'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_attente_document', 'entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
-                     'affiche_total'=>'true',
-                     'etat'=>'document_enregistre',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_attente_document',
                     'id' => 'param_validation_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'socopi'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_attente_document', 'entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
-                     'affiche_total'=>'true',
-                     'etat'=>'document_enregistre',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_attente_document',
                     'id' => 'param_livraison_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'djela'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_attente_document', 'entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
-                     'affiche_total'=>'true',
-                     'etat'=>'document_enregistre',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider_attente_document',
                     'id' => 'param_livrer_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'document_enregistre','entreprise' => 'yefien'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider_attente_document', 'entreprise' => 'yefien'])
                 ],
             ],
 
             'demande_t' => [
                 [
                     'label' => 'suzang group',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider',
                     'id' => 'param_initie_demande_su',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'suzang group'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider', 'entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider',
                     'id' => 'param_initie_demande_appatam',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'appatam'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider', 'entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider',
                     'id' => 'param_validation_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'socopi'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider', 'entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider',
                     'id' => 'param_livraison_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'djela'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider', 'entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_valider',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_valider',
                     'id' => 'param_livrer_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_valider','entreprise' => 'yefien'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_valider', 'entreprise' => 'yefien'])
                 ],
             ],
             'demande_r' => [
                 [
                     'label' => 'suzang group',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_initie_demande_su',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'suzang group'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_refuser', 'entreprise' => 'suzang group'])
                 ],
                 [
                     'label' => 'Appatam',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_initie_demande_appatam',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'appatam'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_refuser', 'entreprise' => 'appatam'])
                 ],
                 [
                     'label' => 'Socopi',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_validation_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'socopi'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_refuser', 'entreprise' => 'socopi'])
                 ],
                 [
                     'label' => 'Djela',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_livraison_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'djela'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_refuser', 'entreprise' => 'djela'])
                 ],
                 [
                     'label' => 'Yefien',
-                     'affiche_total'=>'true',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'true',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_livrer_demande',
-                    'href' => $this->generateUrl('app_president_demande_index', ['etat'=>'demande_refuser','entreprise' => 'yefien'])
+                    'href' => $this->generateUrl('app_president_demande_index', ['etat' => 'demande_refuser', 'entreprise' => 'yefien'])
                 ],
             ],
-            'infos'=>[
+            'infos' => [
                 [
                     'label' => 'suzang group',
-                     'affiche_total'=>'false',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'false',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_initie_demande_su',
                     'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT4'])
                 ],
                 [
                     'label' => 'Appatam',
-                     'affiche_total'=>'false',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'false',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_initie_demande_appatam',
                     'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT1'])
                 ],
                 [
                     'label' => 'Socopi',
-                     'affiche_total'=>'false',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'false',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_validation_demande',
                     'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT5'])
                 ],
                 [
                     'label' => 'Djela',
-                     'affiche_total'=>'false',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'false',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_livraison_demande',
                     'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT3'])
                 ],
                 [
                     'label' => 'Yefien',
-                     'affiche_total'=>'false',
-                    'etat'=>'demande_refuser',
+                    'affiche_total' => 'false',
+                    'etat' => 'demande_refuser',
                     'id' => 'param_livrer_demande',
                     'href' => $this->generateUrl('app_utilisateur_employe_infos_index', ['entreprise' => 'ENT2'])
                 ],
             ]
-            
+
         ];
 
 

@@ -59,10 +59,11 @@ class EmployeType extends AbstractType
                             'message' => 'Please enter a password',
                         ]), */
                         new Length([
+                            //'max' => 10,
                             'min' => 10,
-                            'minMessage' => 'Renseigner au minumum et au maximum {{ limit }} characteres',
+                            'minMessage' => 'Renseigner au minumum et au maximum {{ limit }} characteres le champs contact',
+
                             // max length allowed by Symfony for security reasons
-                            'max' => 10,
                         ]),
                     ],
                 ]

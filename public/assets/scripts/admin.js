@@ -17,7 +17,59 @@ const default_template = `
     </div>
 `;
 
+const array_sum =  (values) => values.reduce((accumulator, current) => accumulator + current);
 
+$('body').on('click', ".btn-stack", function (e) {
+    
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const $this = $(this);
+    const $container = $this.closest('.modal-body');
+    const $modal_content = $container.closest('.modal-content');
+  
+    const $modal_dialog = $container.closest('.modal-dialog');
+    const target = $this.attr('data-bs-stacked-modal');
+
+    $.ajax({
+      url: $this.attr('href'),
+      beforeSend: function () {
+        $modal_dialog.removeClass('modal-xl').removeClass('modal-lg').removeClass('modal-sm').removeClass('modal-fullscreen');
+        $modal_dialog.addClass($(target).find('.modal-dialog').attr('class'));
+        $modal_content.html(default_template);
+      },
+      success: function (html) {
+        $modal_content.html(html);
+      }
+    })
+
+  });
+
+$(document).on('click', '.btn-modal-back', function (e) {
+    e.preventDefault();
+    const $this = $(this);
+    const redirect = $this.attr('data-redirect');
+    const options = JSON.parse($this.attr('data-options'));
+
+    if (options && typeof options.grid && options.grid === true) {
+        let modal_dialog_size = null;
+        if (['modal-lg', 'modal-sm', 'modal-fullscreen', 'modal-xl'].includes(options.class)) {
+            modal_dialog_size = options.class;
+        } else {
+            modal_dialog_size = 'modal-lg';
+        }
+
+        const $parent = $this.closest('.modal');
+        const $modal_content = $parent.find('.modal-content');
+        const $modal_dialog = $parent.find('.modal-dialog');
+
+        $modal_dialog.removeClass('modal-xl').removeClass('modal-lg').removeClass('modal-sm').removeClass('modal-fullscreen');
+        $modal_dialog.addClass(modal_dialog_size);
+        $modal_content.html(default_template);
+        $modal_content.load(redirect, function (html) {
+            //$modal_content.html(html);
+        });
+    }
+});
 
 
 $(document).on('click', '.link-view-child', function (e) {
@@ -161,7 +213,20 @@ function reload_page(url, index = 0, persist_flash = false, data = null, is_set 
                 },
                 success: function(json) {
                     var table = $grid.find(`#${id}`).DataTable();
-                    table.ajax.reload( null, false );
+                    table.ajax.reload( function () {
+                        if ($('.active-li').find('.badge')) {
+                        
+                            const $badge = $('.active-li').find('.badge');
+                            let old_value = +$badge.text();
+                            let current_value = table.rows().count()
+                            $badge.text(current_value);
+                            if (current_value == 0) {
+                                $badge.removeClass('badge-success').addClass('badge-dark');
+                            }
+                        }
+                    }, false );
+
+                   
                 },
                 error: function (jqXHR, exception) {
                     
@@ -243,8 +308,23 @@ $(function() {
     let modals = new Set();
 
     $('body').on('hidden.bs.modal', '.modal', function() {
-        $(this).removeData('bs.modal');
+       
+        const $this = $(this);
+        $this.removeData('bs.modal');
+        const old_class = $this.find('.modal-dialog').attr('class');
+     
+        $this.find('.modal-dialog').removeClass('modal-fullscreen modal-sm modal-md modal-lg modal-xl').addClass($this.attr('data-class') || old_class);
     });
+
+
+    /*$('body').on('kpl:reload-modal', function(e, $modal) {
+       console.log(e, $modal);
+        const $this = $(this);
+        $this.removeData('bs.modal');
+        const old_class = $this.find('.modal-dialog').attr('class');
+     
+        $this.find('.modal-dialog').removeClass('modal-fullscreen modal-sm modal-md modal-lg modal-xl').addClass($this.attr('data-class') || old_class);
+    });*/
 
 
     $(document).on('click', '.btn-ajax-etat', function (e) {
@@ -489,6 +569,7 @@ $(function() {
         $form.ajaxSubmit({
             cache: false,
             data: data,
+            global: false,
             beforeSend: () => {
                 console.log('Before send....');
                 if (!$this.hasClass('btn-inner-ajax')) {
@@ -535,6 +616,7 @@ $(function() {
                 const ajax_container = data.ajaxContainer;
                 const gridWrapper = data.gridWrapper;
                 const url = data.url;
+                const reload__grid = data.data;
                 const tabId = data.tabId;
                 const close_btn = data.closeBtn;
                 const push_dgr = data.pushDgr;
@@ -543,8 +625,11 @@ $(function() {
                 let $alert;
                 const _reload_page = keys.indexOf('reloadPage') >= 0 ? data.reloadPage: true;
                 const showAlert = keys.indexOf('showAlert') >= 0 ? data.showAlert : false;
+                const reload_tab = keys.indexOf('reloadTab') >= 0 ? data.reloadTab: true;
                 const content = data.content;
+                const _data = data.data;
                 const resubmit = data.resubmit;
+                const persist_flash = data.persistFlash;
               
                 if (data.statut) {
                     
@@ -634,14 +719,12 @@ $(function() {
                             //console.log( data );
                             if (data.fullRedirect) {
                                 $alert.then(() => {
-                                  
-                                     document.location.href = redirect;
-                                  
+                                    document.location.href = redirect;
                                 });
                             } else {
                                
                                 if (redirect && !actions && _reload_page) {
-                                  
+                                    console.log('HERE');
                                     $alert.then(() => reload_page(redirect, 0 , data.persistFlash, data.data, false, ajax_container, gridWrapper));
                                 }
 
@@ -658,10 +741,10 @@ $(function() {
                             
                             switch (actions['action']) {
                                 case 'switch_tab':
-                                    load_tab(actions.target, null, actions.index);
+                                    load_tab(actions.target, {id: actions.id}, actions.index);
                                     break;
                                 case 'reload_modal':
-                                    _reload_modal( $(`${actions.target}`), data.redirect);
+                                    $alert.then(() =>  _reload_modal( $(`${actions.target}`), actions.url || redirect));
                                     break;
                                 case 'remove_assigned':
                                     const $parent = $(`${actions.target}`);
@@ -675,13 +758,36 @@ $(function() {
                                     $(`${actions.fragment}`).html(`${actions.content}`);
                                     break;
                                 case 'open_modal':
-                                    const $selector = $(`${actions.target}`);
-                                    //const modal = new bootstrap.Modal(document.getElementById(`${actions.target}`));
-                                    //$selector.modal('toggle');
-                                    $selector[0].toggle();
-                                    $selector.find('.modal-content').load(actions.url, () => {
-                                        $('body').addClass('modal-open');
+                                    if (_data) {
+                                        reload_page(redirect, 0 , persist_flash, _data, false, ajax_container, gridWrapper, reload_tab);
+                                    }
+                                    $alert.then(() =>  {
+                                        const $selector = $(`${actions.target}`);
+                                        $selector.modal('toggle');
+                                        $selector.find('.modal-content').load(actions.url, () => {
+                                            $('body').addClass('modal-open');
+                                        });
                                     });
+                                   
+
+                                   
+                                   
+                                    break;
+                                case 'reload_grid':
+                                    $alert.then( () => {
+                                        $alertFeedback.addClass('d-none');
+                                        const $grid_parent_selector = $(`${actions.target}`);
+                                        const $grid_id = $(`${actions.grid_id}`);
+                                        const $modal_body = $(`${actions.modal_body}`);
+                                        
+                                        $modal_body.closest('.modal-dialog').removeClass('modal-sm modal-fullscreen modal-lg modal-xl')
+                                            .addClass(actions.modal_dialog || 'modal-lg');
+                                        $modal_body.closest('.modal-content').html(default_template).load(redirect);
+                                        ;
+                                        
+                                    });
+                                   
+                                    
                                    
                                     break;
                                 case 'update_data':
@@ -898,8 +1004,10 @@ $(function() {
 
 
     // Appel chargement du contenu pendant l'ouverture du modal
-	$('.modal').on('show.bs.modal', function(e) {
+    $('.modal').on('show.bs.modal', function (e)
+    {
         const $target = $(e.relatedTarget);
+        
         const $this = $(this);
         const options = $this.data('options');
 
@@ -924,7 +1032,7 @@ $(function() {
                     }
                     
                 });
-
+                
 
 
 
@@ -939,10 +1047,11 @@ $(function() {
         if ($target.attr('data-href')) {
             $this.find('.modal-content').load($target.attr('data-href'));
         }
+
+        
     });
 
-
-    function _reload_modal($target, url) {
+    function _reload_modal($target, url, className = '') {
         const $content =  $target.find('.modal-content');
         
 
@@ -1023,7 +1132,7 @@ $(function() {
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
         </div>`;
                 $target.find('.modal-title').text('Erreur')
                 $target.find('.modal-content').html(modal_content);
@@ -1112,6 +1221,22 @@ $(function() {
         });
     }
 
-  
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1)
+    {
+        const allModals = document.querySelectorAll('.modal:not(.initialized)');
 
-})
+        allModals.forEach(modal => {
+            modal.addEventListener('shown.bs.modal', function () {
+                bootstrap.Modal.getInstance(this).handleUpdate();
+                this.classList.add('initialized');
+                //alert(2);
+            });
+        });
+    }
+
+});
+
+
+$(function () {
+    
+});

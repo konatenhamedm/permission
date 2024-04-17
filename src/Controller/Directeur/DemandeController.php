@@ -243,6 +243,8 @@ class DemandeController extends BaseController
     #[Route('/{etat}/demande', name: 'app_directeur_demande_demande_index', methods: ['GET', 'POST'])]
     public function indexDemande(Request $request, string $etat, DataTableFactory $dataTableFactory): Response
     {
+        //dd('');
+        //dd('');
         if ($etat == 'demande_initie') {
 
             $titre = "Demandes initiées";
@@ -251,11 +253,11 @@ class DemandeController extends BaseController
             $titre = "Demandes en attente d'approbation du président";
         } elseif ($etat == 'demande_valider_attente_document') {
 
-            $titre = "Demande en cours de validation";
-        } elseif ($etat == 'document_enregistre') {
+            $titre = "Demande attente de documents";
+        } elseif ($etat == 'document_soumis_directeur') {
 
 
-            $titre = "Demande en attente de document pour être clôturée";
+            $titre = "Demande en attente de vérification du document pour être clôturée";
         } elseif ($etat == 'demande_valider') {
 
             $titre = "Demandes acceptées";
@@ -267,7 +269,10 @@ class DemandeController extends BaseController
         $groupe = $this->security->getUser()->getGroupe()->getName();
         $permission = $this->menu->getPermissionIfDifferentNull($this->security->getUser()->getGroupe()->getId(), "app_directeur_demande_demande_index");
         // dd(';jjkj');
+
+        //dd($groupe);
         $table = $dataTableFactory->create()
+            ->add('dateCreation', DateTimeColumn::class, ['label' => 'Date demande', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
             ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date debut', 'format' => 'd-m-Y', "searchable" => true, 'globalSearchable' => true])
             /* ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y']) */
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
@@ -275,7 +280,7 @@ class DemandeController extends BaseController
             ->add('prenom', TextColumn::class, ['label' => 'Prenoms', 'field' => 'e.prenom'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Demande::class,
-                'query' => function (QueryBuilder $qb)  use ($etat) {
+                'query' => function (QueryBuilder $qb)  use ($etat, $groupe) {
                     $qb->select('d,u, e, f, en')
                         ->from(Demande::class, 'd')
                         ->join('d.utilisateur', 'u')
@@ -283,8 +288,18 @@ class DemandeController extends BaseController
                         ->join('e.entreprise', 'en')
                         ->orderBy('d.dateCreation', 'ASC')
                         ->join('e.fonction', 'f')
-                        ->andWhere('u =:user')
-                        ->setParameter('user', $this->security->getUser());
+                        /*  ->andWhere('u =:user')
+                        ->setParameter('user', $this->security->getUser()) */
+
+                        ->orderBy('d.dateCreation', 'DESC');
+
+                    if ($groupe == 'Directeurs') {
+                        $qb->andWhere("en =:entreprise")
+                            ->setParameter('entreprise', $this->security->getUser()->getEmploye()->getEntreprise());
+                    } else {
+                        $qb->andWhere("u =:user")
+                            ->setParameter('user', $this->security->getUser());
+                    }
 
 
                     if ($etat == 'demande_initie') {
@@ -296,9 +311,9 @@ class DemandeController extends BaseController
                     } elseif ($etat == 'demande_valider_attente_document') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_attente_document");
-                    } elseif ($etat == 'document_enregistre') {
+                    } elseif ($etat == 'document_soumis_directeur') {
                         $qb->andWhere("d.etat =:etat")
-                            ->setParameter('etat', "document_enregistre");
+                            ->setParameter('etat', "document_soumis_directeur");
                     } elseif ($etat == 'demande_valider') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider");
@@ -318,12 +333,12 @@ class DemandeController extends BaseController
                 } elseif ($permission == 'RD') {
                     return false;
                 } elseif ($permission == 'RU') {
-                    return $etat == 'document_enregistre';
-                } elseif ($permission == 'CRUD' && $etat == 'document_enregistre') {
+                    return $etat == 'demande_valider_attente_document';
+                } elseif ($permission == 'CRUD' && $etat == 'demande_valider_attente_document' && $groupe == "Collaborateurs") {
 
                     return true;
                 } elseif ($permission == 'CRU') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 } elseif ($permission == 'CR') {
                     return false;
                 }
@@ -334,11 +349,11 @@ class DemandeController extends BaseController
                 } elseif ($permission == 'RD') {
                     return false;
                 } elseif ($permission == 'RU') {
-                    return $etat == 'document_enregistre';
-                } elseif ($permission == 'CRUD' && $etat == 'demande_valider_attente_document' && $groupe == "Directeurs") {
-                    return false;
+                    return $etat == 'document_soumis_directeur';
+                } elseif ($permission == 'CRUD' && $etat == 'document_soumis_directeur' && $groupe == "Directeurs") {
+                    return true;
                 } elseif ($permission == 'CRU') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'document_soumis_directeur';
                 } elseif ($permission == 'CR') {
                     return false;
                 }
@@ -375,17 +390,17 @@ class DemandeController extends BaseController
             }),
             'verification' => new ActionRender(function () use ($permission, $etat) {
                 if ($permission == 'R') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 } elseif ($permission == 'RD') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 } elseif ($permission == 'RU') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 } elseif ($permission == 'CRUD') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 } elseif ($permission == 'CRU') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 } elseif ($permission == 'CR') {
-                    return $etat == 'document_enregistre';
+                    return $etat == 'demande_valider_attente_document';
                 }
             }),
 
@@ -412,7 +427,7 @@ class DemandeController extends BaseController
 
                         'actions' => [
                             'edit' => [
-                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_document', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-success', 'title' => 'hghgdhdg'], 'render' => $renders['edit']
+                                'url' => $this->generateUrl('app_demande_demande_edit_workflow_document', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-success', 'title' => 'Valider la demane'], 'render' => $renders['edit']
                             ],
                             'edit_document' => [
                                 'url' => $this->generateUrl('app_demande_demande_edit_workflow_verification', ['id' => $value]), 'ajax' => true, 'icon' => '%icon% bi bi-pen', 'attrs' => ['class' => 'btn-success', 'title' => 'hghgdhdg'], 'render' => $renders['edit_document']
@@ -497,6 +512,7 @@ class DemandeController extends BaseController
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
+                $fullRedirect = true;
                 $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);
@@ -509,7 +525,7 @@ class DemandeController extends BaseController
 
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);

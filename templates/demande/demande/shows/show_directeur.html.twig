@@ -2,7 +2,7 @@
     {% form_theme form 'widget/fields-block.html.twig' %}
     {% from '_macros/demande_workflow.html.twig' import prototype_ligne_colonne %}
     <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Avis du président | <span style="font-size:16px" >{{ demande.utilisateur.employe.nomComplet}}</span></h5>
+        <h5 class="modal-title" id="exampleModalLabel">Détails demande</h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,7 +27,7 @@
              <div class="row">
             <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Type*</label>
-                {{ form_widget(form.type,{attr:{'readonly':true}}) }}</div>
+                {{ form_widget(form.type,{attr:{'readonly':'readonly'}}) }}</div>
                   <div class="form-group col-md-6">
                 <label class="sr-onl" for="userinput1">Date debut*</label>
                 {{ form_widget(form.dateDebut) }}</div>
@@ -40,7 +40,7 @@
 
             <div class="form-group col-md-4">
                 <label class="sr-onl" for="userinput1">Nombre de jour(inclus)*</label>
-                {{ form_widget(form.nbreJour,{attr:{'readonly':true}}) }}
+                {{ form_widget(form.nbreJour,{attr:{'readonly':'readonly'}}) }}
                </div>
 
         </div>
@@ -55,7 +55,8 @@
 
         </div>
         <div style="border-bottom:3px solid #000"><br>
-        </div>
+        </div><br>
+        {% if demande.avis != null %}
             <div class="row">
                 <h3 style="color:#3498db">Avis directeur</h3>
             </div>
@@ -75,7 +76,8 @@
                 </div>
 
             </div>
-
+        {% endif %}
+         {% if demande.avisPresident != null %}
                 <div class="row">
                     <h3 style="color:red">Avis président</h3>
                 </div>
@@ -95,11 +97,48 @@
                     </div>
 
                 </div>
-                <!--end::Input group-->
-
-
+              {% endif %}
+        
 
         </div>
+          <br>
+         {% if demande.etat in ['document_soumis_directeur','demande_valider'] %}
+                    <div class="row">
+        <h2>Liste des documents joints à la demande </h2><br>
+                <table class="table table-rounded table-bordered border gy-3 gs-3">
+                    <thead  >
+
+                    </thead>
+                    <tbody>
+                    {% if(documents |length > 0) %}
+                        {% for doc in documents %}
+                            <tr id="element-1" class="border-bottom border-gray-200" style="background-color: #fff">
+                            <td colspan="4" >
+
+                                <div class="form-group">
+                                    <div class="list-group">
+                                        <a class="list-group-item" href="{{ path('fichier_index', {id:  doc.id}) }}" target="_blank">
+                                            <span class="fa fa-paperclip"></span> {{ doc.alt }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        {% endfor %}
+
+                        </tr>
+                    {% else %}
+                        <tr id="element-1" class="border-bottom border-gray-200" style="background-color: #fff">
+                            <td colspan="4" >
+                                <h4>Il n'y a aucun document</h4>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+
+                    </tbody></table>
+        </div>
+        {% endif %}
+
          <div class="row">
                 <h3 style="color:#3498db">Motif demandeur</h3>
             </div>
@@ -107,13 +146,12 @@
         {{ prototype_ligne_colonne(form) }}
 
 
+
+
+
     </div>
     <div class="modal-footer">
-        {# {{ include('_includes/ajax/loader.html.twig') }} #}
         {{ form_widget(form.annuler) }}
-        {{ form_widget(form.accepatation_president) }}
-        {{ form_widget(form.accepatation_president_attente_document) }}
-        {{ form_widget(form.refuser_president) }}
     </div>
     {{ form_widget(form._token) }}
     {{ form_end(form, {render_rest: false}) }}
@@ -124,33 +162,18 @@
 
 {% block java %}
     <script>
-   init_select2($this, null, '#exampleModalSizeSm2');
+     $(function(){
+    init_select2('select', null, '#exampleModalSizeSm2');
 
-        $(function () {
-               
-if($('.type').find('option:selected').attr('value') == "TYPE_JOURNEE"){
+})
+  if($('.type').find('option:selected').attr('value') == "TYPE_JOURNEE"){
              $('.demi').hide();
                     $('.journee').show();
         }else{
               $('.demi').show();
                     $('.journee').hide();
         }
-    const $type = $('#{{ form.type.vars.id }}');
-    
-            $type.on('change', function () {
-                const $this = $(this);
-                const current_value = $this.find('option:selected').attr('value');
-                //alert(current_value);
-                //$error.html('');
-               if (current_value == "TYPE_JOURNEE" ) {
-                    $('.demi').hide();
-                    $('.journee').show();
-                } else {
-                     $('.demi').show();
-                    $('.journee').hide();
-                }
-            });
-
+   
         if($('.element').find('option:selected').attr('data-value') == "MOT1"){
             $(".enfant").show()
         }else{
@@ -188,6 +211,9 @@ if($('.type').find('option:selected').attr('value') == "TYPE_JOURNEE"){
                 $(this).val(picker.startDate.format('DD/MM/YYYY'));
             });
         });
+
+        $(function () {
+
             const $container = $('.row-colonne');
 
             var index = $container.length;

@@ -81,7 +81,7 @@ class DashboardController extends AbstractController
                     'href' => $this->generateUrl('app_president_dashboard_demande_woman_man')
                 ],
                 [
-                    'label' => 'Classement par nombre',
+                    'label' => 'Classement par nombre de jours',
                     'id' => 'chart_classement',
                     'icon' => 'bi bi-list',
                     'href' => $this->generateUrl('app_president_dashboard_classement_par_nombre_entreprise')

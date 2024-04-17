@@ -72,6 +72,11 @@ class Menu
         $repo = $this->em->getRepository(Demande::class)->nombreDemandeByUser($etat, $utilisateur);
         return $repo;
     }
+    public function nombreDemandeByEntreprise($etat, $entreprise)
+    {
+        $repo = $this->em->getRepository(Demande::class)->nombreDemandeByEntreprise($etat, $entreprise);
+        return $repo;
+    }
 
     public function nombreEmploye($entreprise)
     {

@@ -7,7 +7,9 @@
                <label class="sr-onl" for="userinput1">Choisissez un motif*</label>
             {{ form_row(colonne.element,{'attr':{'class':'form-control element'}}) }}
             </div>
-            <div class="form-group col-md-6">{{ form_row(colonne.nomEnfant,{'attr':{'class':'form-control enfant','placeholder':"Precisez le nom de l'enfant",}}) }}</div>
+            <div class="form-group col-md-6 enfant">
+            
+            {{ form_row(colonne.nomEnfant,{'attr':{'class':'form-control ','placeholder':"Precisez le nom de l'enfant",}}) }}</div>
         </div>
         <div class="row ">
             <div class="form-group col-md-12">{{ form_row(colonne.precisez,{'attr':{'class':'form-control precisez','placeholder':"Donnez un justification",}}) }}</div>

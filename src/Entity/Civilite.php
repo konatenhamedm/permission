@@ -5,9 +5,10 @@ namespace App\Entity;
 use App\Repository\CiviliteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Attribute\Source;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CiviliteRepository::class)]
-#[ORM\Table(name:'param_civilite')]
+#[ORM\Table(name: 'param_civilite')]
 #[Source]
 class Civilite
 {

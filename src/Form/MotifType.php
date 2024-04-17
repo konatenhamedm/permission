@@ -52,14 +52,15 @@ class MotifType extends AbstractType
                     'choice_label' => 'libelle',
                     'choices' => $departement,
                     'disabled' => false,
-                    'label' => false,
+                    'label' => 'Motif',
                     //'placeholder'=>'Selectionnez un motif',
                     'attr' => ['class' => 'has-select2 form-select element']
                     /*'constraints'=>new NotBlank(['message'=>'Selectionnez un departement']),*/
                 ]);
             })
             ->add('nomEnfant', TextType::class, [
-                'label' => false,
+                'label' => 'Precisez le nom de l\'enfant',
+                //'attr' => ['class' => 'nomEnfant']
 
             ])
 

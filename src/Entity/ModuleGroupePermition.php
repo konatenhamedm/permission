@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use App\Repository\ModuleGroupePermitionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ModuleGroupePermitionRepository::class)]
-#[UniqueEntity(fields: ['module', 'groupeModule'],errorPath: 'module',message: 'Ce module est deja utilisé pour ce groupe.')]
+#[UniqueEntity(fields: ['module', 'groupeModule'], errorPath: 'module', message: 'Ce module est deja utilisé pour ce groupe.')]
 class ModuleGroupePermition
 {
     #[ORM\Id]
@@ -123,5 +124,4 @@ class ModuleGroupePermition
 
         return $this;
     }
-
 }

@@ -46,38 +46,42 @@ class EmployeRepository extends ServiceEntityRepository
     /**
      * @return mixed
      */
-    public function withoutAccount()
+    public function withoutAccount($entreprise)
     {
         $qb = $this->createQueryBuilder('e');
         $qb->select('e')
+            ->leftJoin('e.entreprise', 'en')
             ->leftJoin('e.utilisateur', 'u2')
-            ->andWhere('u2.employe IS NULL');
+            ->andWhere('en =:entreprise')
+            ->andWhere('u2.employe IS NULL')
+            ->setParameter('entreprise', $entreprise);
 
         return $qb;
     }
-   
 
-    public function nombreEmploye($entreprise){
+
+    public function nombreEmploye($entreprise)
+    {
         return $this->createQueryBuilder('e')
-                ->select("count(e.id)")
-                ->join('e.entreprise','en')
-                ->andWhere('en.denomination =:entreprise')
-                ->setParameter('entreprise',$entreprise)
-                ->getQuery()
-                  ->getSingleScalarResult();
+            ->select("count(e.id)")
+            ->join('e.entreprise', 'en')
+            ->andWhere('en.denomination =:entreprise')
+            ->setParameter('entreprise', $entreprise)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
 
-    
 
-public function getNombreDemandeParMois($date,$employe,$etat)
-{
-    $em = $this->getEntityManager();
-    $connection = $em->getConnection();
-    $tableEmploye = $this->getTableName(Employe::class, $em);
-    $tableUtilisateur = $this->getTableName(Utilisateur::class, $em);
-    $tableDemande = $this->getTableName(Demande::class, $em);
-           if($etat == null){
+
+    public function getNombreDemandeParMois($date, $employe, $etat)
+    {
+        $em = $this->getEntityManager();
+        $connection = $em->getConnection();
+        $tableEmploye = $this->getTableName(Employe::class, $em);
+        $tableUtilisateur = $this->getTableName(Utilisateur::class, $em);
+        $tableDemande = $this->getTableName(Demande::class, $em);
+        if ($etat == null) {
             $sql = <<<SQL
             SELECT COUNT(*) AS _total, DATE_FORMAT(date_debut,'%M') as mois
            FROM {$tableDemande} d
@@ -86,10 +90,10 @@ public function getNombreDemandeParMois($date,$employe,$etat)
           
           
            /*  WHERE YEAR(date_debut) in (:date)  */ 
-           SQL; 
-           }else{
+           SQL;
+        } else {
 
-               $sql = <<<SQL
+            $sql = <<<SQL
             SELECT COUNT(*) AS _total, DATE_FORMAT(date_debut,'%D') as jour,d.nbre_jour
            FROM {$tableDemande} d
            JOIN {$tableUtilisateur} u ON u.id = d.utilisateur_id
@@ -97,71 +101,71 @@ public function getNombreDemandeParMois($date,$employe,$etat)
           
           
            /*  WHERE YEAR(date_debut) in (:date)  */ 
-           SQL; 
-           }
-                
-           
-        
+           SQL;
+        }
+
+
+
         //$params['statut'] = $statut;
         $params['date'] = $date;
         $params['employe'] = $employe;
         $params['etat'] = $etat;
-       
+
         $ands = [];
-       
-     
-    
+
+
+
         if ($ands) {
             $sql .= ' AND ';
         }
-    
-    
-        $sql .=  implode(' AND ', $ands);
-      
-       
-        if($etat == null){
-             $sql .= ' WHERE e.id =:employe and YEAR(date_debut) in (:date)';
-             $sql .= ' GROUP BY mois';
-            }else{
-                
-                $sql .= " WHERE e.id =:employe and DATE_FORMAT(d.date_debut,'%M') =:date";
-                $sql .= ' GROUP BY d.nbre_jour,jour';
-            }
-           
 
-           
+
+        $sql .=  implode(' AND ', $ands);
+
+
+        if ($etat == null) {
+            $sql .= ' WHERE e.id =:employe and YEAR(date_debut) in (:date)';
+            $sql .= ' GROUP BY mois';
+        } else {
+
+            $sql .= " WHERE e.id =:employe and DATE_FORMAT(d.date_debut,'%M') =:date";
+            $sql .= ' GROUP BY d.nbre_jour,jour';
+        }
+
+
+
 
 
         //$sql .= ' GROUP BY motif,genre';
         $stmt = $connection->executeQuery($sql, $params);
-        
+
         return $stmt->fetchAllAssociative();
-}
+    }
 
-    
 
-//    /**
-//     * @return Employe[] Returns an array of Employe objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
 
-//    public function findOneBySomeField($value): ?Employe
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    /**
+    //     * @return Employe[] Returns an array of Employe objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('p.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Employe
+    //    {
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

@@ -39,21 +39,21 @@ class DemandeConfigController extends BaseController
                 'href' => $this->generateUrl('app_directeur_demande_demande_index', ['etat' => 'demande_valider_directeur'])
             ],
             [
-                'label' => 'Documents',
-                'icon' => 'bi bi-folder',
-                'etat' => 'document_enregistre',
-                'role' => 'ROLE_ALL',
-                'name' => 'sortie',
-                'href' => $this->generateUrl('app_directeur_demande_demande_index', ['etat' => 'document_enregistre'])
-            ],
-
-            [
-                'label' => 'Vérification Document',
+                'label' => 'Attente docs',
                 'icon' => 'bi bi-folder',
                 'etat' => 'demande_valider_attente_document',
                 'role' => 'ROLE_ALL',
-                'name' => 'sortie',
+                'name' => 'sortie_attente',
                 'href' => $this->generateUrl('app_directeur_demande_demande_index', ['etat' => 'demande_valider_attente_document'])
+            ],
+
+            [
+                'label' => 'Vérification Docs',
+                'icon' => 'bi bi-folder',
+                'etat' => 'document_soumis_directeur',
+                'role' => 'ROLE_ALL',
+                'name' => 'sortie_verification',
+                'href' => $this->generateUrl('app_directeur_demande_demande_index', ['etat' => 'document_soumis_directeur'])
             ],
             [
                 'label' => 'Demandes validées',

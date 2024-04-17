@@ -34,25 +34,29 @@ class DemandeWorkflowType extends AbstractType
         //dd($this->security->getUser());
 
         $builder
-        ->add('type', ChoiceType::class,
-        [   'placeholder'=>'Choissez un type de mande',
-            'required'     => false,
-            'expanded'     => false,
-            'attr' => ['class' => 'has-select2 type'],
-            'multiple' => false,
-            'choices'  => array_flip([
-                'TYPE_JOURNEE' => 'Toute la journée',
-                'TYPE_DEMI_JOURNEE' => 'Demi journée'
-            ]),
-        ])
-        ->add('heureDebut',TimeType::class,[
-            'input'  => 'datetime',
-            'widget' => 'single_text',
-        ])
-        ->add('heureFin',TimeType::class,[
-            'input'  => 'datetime',
-            'widget' => 'single_text',
-        ])
+            ->add(
+                'type',
+                ChoiceType::class,
+                [
+                    'placeholder' => 'Choissez un type de mande',
+                    'required'     => false,
+                    'expanded'     => false,
+                    'attr' => ['class' => 'has-select2 type'],
+                    'multiple' => false,
+                    'choices'  => array_flip([
+                        'TYPE_JOURNEE' => 'Toute la journée',
+                        'TYPE_DEMI_JOURNEE' => 'Demi journée'
+                    ]),
+                ]
+            )
+            ->add('heureDebut', TimeType::class, [
+                'input'  => 'datetime',
+                'widget' => 'single_text',
+            ])
+            ->add('heureFin', TimeType::class, [
+                'input'  => 'datetime',
+                'widget' => 'single_text',
+            ])
             ->add('dateDebut', DateType::class, [
                 "required" => false,
                 "widget" => 'single_text',
@@ -69,8 +73,8 @@ class DemandeWorkflowType extends AbstractType
                 "empty_data" => '',
                 'attr' => ['class' => 'dateFin']
             ])
-            ->add('nbreJour',TextType::class,[
-                'label'=>'Nombre de jour(inclus)',
+            ->add('nbreJour', TextType::class, [
+                'label' => 'Nombre de jour(inclus)',
                 'attr' => ['class' => 'nbre']
             ])
             ->add('motifs', CollectionType::class, [
@@ -94,7 +98,7 @@ class DemandeWorkflowType extends AbstractType
                 },
                 'choice_label' => 'libelle',
                 'label' => 'Avis directeur',
-                'attr' => ['class' => 'has-select2 form-select']
+                'attr' => ['class' => 'has-select2 form-select2']
             ])
             ->add('avisPresident', EntityType::class, [
                 'class' => AvisPresident::class,
@@ -103,14 +107,14 @@ class DemandeWorkflowType extends AbstractType
                 },
                 'choice_label' => 'libelle',
                 'label' => 'Avis président',
-                'attr' => ['class' => 'has-select2 form-select']
+                'attr' => ['class' => 'has-select2 form-select2']
             ])
-            ->add('justificationDirecteur',TextType::class,[
+            ->add('justificationDirecteur', TextType::class, [
                 'label' => false,
                 "empty_data" => 'RAS',
                 'attr' => ['class' => 'justDirecteur']
             ])
-            ->add('justificationPresident',TextType::class,[
+            ->add('justificationPresident', TextType::class, [
                 'label' => false,
                 "empty_data" => 'RAS',
                 'attr' => ['class' => 'justPresident']
@@ -127,17 +131,16 @@ class DemandeWorkflowType extends AbstractType
                 'prototype' => true,
             ])*/
             /*->add('utilisateur')*/
-            ->add('annuler',SubmitType::class,['label' => 'Annuler', 'attr' => ['class' => 'btn btn-primary btn-sm' ,'data-bs-dismiss'=>'modal']])
-            ->add('save',SubmitType::class,['label' => 'Enregister', 'attr' => ['class' => 'btn btn-main btn-ajax btn-sm']])
-            ->add('passer',SubmitType::class,['label' => 'Valider etape', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('refuser',SubmitType::class,['label' => 'Réfuser la demande', 'attr' => ['class' => 'btn btn-danger btn-ajax btn-sm']])
-            ->add('refuser_president',SubmitType::class,['label' => 'Réfuser la demande', 'attr' => ['class' => 'btn btn-danger btn-ajax btn-sm']])
-            ->add('accepatation_president',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-warning btn-ajax btn-sm']])
-            ->add('accepatation_president_attente_document',SubmitType::class,['label' => 'Accepte et attente document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('document_enregister',SubmitType::class,['label' => 'Soumettre le document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            ->add('document_verification_accepte',SubmitType::class,['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
-            /* ->add('document_verification_refuse',UrlT::class,['label' => 'Rejeter le document', 'attr' => ['class' => 'btn btn-danger  btn-sm','data-bs-stacked-toggle'=>"modal" ,'data-bs-stacked-modal'=>"#exampleModalSizeLg1",'href'=>"{{ path('app_demande_demande_show_president',{'id':8 }) }}",]]) */
-        ;
+            ->add('annuler', SubmitType::class, ['label' => 'Annuler', 'attr' => ['class' => 'btn btn-primary btn-sm', 'data-bs-dismiss' => 'modal']])
+            ->add('save', SubmitType::class, ['label' => 'Enregister', 'attr' => ['class' => 'btn btn-main btn-ajax btn-sm']])
+            ->add('passer', SubmitType::class, ['label' => 'Valider etape', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            ->add('refuser', SubmitType::class, ['label' => 'Réfuser la demande', 'attr' => ['class' => 'btn btn-danger btn-ajax btn-sm']])
+            ->add('refuser_president', SubmitType::class, ['label' => 'Réfuser la demande', 'attr' => ['class' => 'btn btn-danger btn-ajax btn-sm']])
+            ->add('accepatation_president', SubmitType::class, ['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-warning btn-ajax btn-sm']])
+            ->add('accepatation_president_attente_document', SubmitType::class, ['label' => 'Accepte et attente document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            ->add('document_enregister', SubmitType::class, ['label' => 'Soumettre le document', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            ->add('document_verification_accepte', SubmitType::class, ['label' => 'Cloturer la demande', 'attr' => ['class' => 'btn btn-success btn-ajax btn-sm']])
+            /* ->add('document_verification_refuse',UrlT::class,['label' => 'Rejeter le document', 'attr' => ['class' => 'btn btn-danger  btn-sm','data-bs-stacked-toggle'=>"modal" ,'data-bs-stacked-modal'=>"#exampleModalSizeLg1",'href'=>"{{ path('app_demande_demande_show_president',{'id':8 }) }}",]]) */;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

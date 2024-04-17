@@ -21,9 +21,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class UtilisateurType extends AbstractType
 {
     private $userGroupe;
+    private $entreprise;
     public function __construct(Security $security)
     {
+
+        // dd($security->getUser()->getEmploye()->getEntreprise());
         $this->userGroupe = $security->getUser()->getGroupe()->getName();
+        $this->entreprise = $security->getUser()->getEmploye()->getEntreprise();
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -99,10 +103,11 @@ class UtilisateurType extends AbstractType
                 'employe',
                 EntityType::class,
                 [
+                    'placeholder' => 'Choisir un employé',
                     'class' => Employe::class,
                     'choice_label' => 'nomComplet',
                     'query_builder' => function (EntityRepository $er) {
-                        return $er->withoutAccount();
+                        return $er->withoutAccount($this->entreprise);
                     }
                 ]
             );

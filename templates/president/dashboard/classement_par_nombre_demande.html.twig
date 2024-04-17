@@ -86,9 +86,7 @@ Highcharts.chart('container', {
         text: ''
     },
     subtitle: {
-        text: 'Source: ' +
-            '<a href="https://www.fhi.no/en/id/infectious-diseases/coronavirus/daily-reports/daily-reports-COVID19/"' +
-            'target="_blank">FHI</a>'
+        text: ''
     },
     xAxis: {
         categories:['0-4',
@@ -99,17 +97,17 @@ Highcharts.chart('container', {
             '50+',
     ],
         title: {
-            text: 'Age groups'
+            text: 'Nombre'
         }
     },
     yAxis: {
         title: {
             margin: 20,
-            text: 'Reported cases'
+            text: 'Nombre de jours'
         }
     },
     tooltip: {
-        headerFormat: '<b>Age: {point.x}</b><br>'
+        headerFormat: '<b>Intervalle: {point.x}</b><br>'
     },
     plotOptions: {
         series: {

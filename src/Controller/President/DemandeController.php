@@ -36,9 +36,9 @@ class DemandeController extends BaseController
         } elseif ($etat == 'demande_valider_attente_document') {
 
             $titre = "Demandes en attente de validation documents";
-        } elseif ($etat == 'document_enregistre') {
+        } elseif ($etat == 'document_soumis_directeur') {
 
-            $titre = "Demandes en attente de document pour la  clôture";
+            $titre = "Demandes en attente de vérification de document pour la  clôture";
         } elseif ($etat == 'demande_valider') {
 
             $titre = "Demandes acceptées";
@@ -78,9 +78,9 @@ class DemandeController extends BaseController
                     } elseif ($etat == 'demande_valider_attente_document') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider_attente_document");
-                    } elseif ($etat == 'document_enregistre') {
+                    } elseif ($etat == 'document_soumis_directeur') {
                         $qb->andWhere("d.etat =:etat")
-                            ->setParameter('etat', "document_enregistre");
+                            ->setParameter('etat', "document_soumis_directeur");
                     } elseif ($etat == 'demande_valider') {
                         $qb->andWhere("d.etat =:etat")
                             ->setParameter('etat', "demande_valider");
@@ -303,7 +303,7 @@ class DemandeController extends BaseController
             }
         }
 
-        return $this->renderForm('demande/demande/edit_workflow_president.html.twig', [
+        return $this->renderForm('demande/demande/edit_workflow_president_test.html.twig', [
             'demande' => $demande,
             /*  'element' => $repository->findOneBySomeField($demande)[0], */
             'form' => $form,

@@ -42,6 +42,7 @@ class AllMethodesDemandeController extends BaseController
         $demande->addMotif($motif);
 
         $demande->setDateDebut($rest);
+        $demande->setDateFin(new DateTime());
         $form = $this->createForm(DemandeType::class, $demande, [
             'method' => 'POST',
             'doc_options' => [
