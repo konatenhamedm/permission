@@ -14,7 +14,7 @@
     <div class="modal-footer">
         {# {{ include('_includes/ajax/loader.html.twig') }} #}
         <button type="button" class="btn btn-default" data-bs-dismiss="modal">Annuler</button>
-        <button type="submit" class="btn btn-main btn-ajax">Valider</button>
+         <button type="submit" class="btn btn-main btn-ajax"><span class="spinner-border d-none  spinner-ajax spinner-border-sm" role="status" aria-hidden="true"></span> Valider</button>
     </div>
     {{ form_end(form) }}
 {% endblock %}

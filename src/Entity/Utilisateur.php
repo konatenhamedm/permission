@@ -48,6 +48,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
     #[ORM\JoinTable(name: 'user_utilisateur_groupe')]
     private Collection $groupes;*/
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $resetToken;
 
 
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
@@ -68,6 +70,26 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * Get the value of resetToken
+     */
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    /**
+     * Set the value of resetToken
+     *
+     * @return  self
+     */
+    public function setResetToken(?string $resetToken): static
+    {
+        $this->resetToken = $resetToken;
+
+        return $this;
     }
 
     public function getUsername(): ?string

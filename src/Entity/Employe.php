@@ -10,7 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
+#[UniqueEntity(['adresseMail'], message: 'Cet email est deja utilisé')]
 class Employe
 {
 
@@ -41,7 +43,7 @@ class Employe
     #[Assert\NotBlank(message: 'Veuillez renseigner le contact')]
     private ?string $contact = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le mail')]
     private ?string $adresseMail = null;
 
@@ -70,6 +72,8 @@ class Employe
     {
         return $this->id;
     }
+
+
 
     public function getNom(): ?string
     {

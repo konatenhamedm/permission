@@ -9,9 +9,11 @@ use App\Service\FormError;
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
 use App\Form\UtilisateurEditType;
+use App\Repository\ConfigAppRepository;
 use App\Service\ActionRender;
 use Doctrine\ORM\QueryBuilder;
 use App\Repository\UtilisateurRepository;
+use App\Service\SendMailService;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Omines\DataTablesBundle\Column\BoolColumn;
@@ -185,9 +187,15 @@ class UtilisateurController extends BaseController
     }
 
 
-    #[Route('/new', name: 'app_utilisateur_utilisateur_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, UtilisateurRepository $utilisateurRepository, FormError $formError): Response
-    {
+    #[Route('/old/new', name: 'app_utilisateur_utilisateur_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        UtilisateurRepository $utilisateurRepository,
+        FormError $formError,
+        SendMailService $sendMailService,
+        EmployeRepository $employeRepository,
+        ConfigAppRepository $configAppRepository,
+    ): Response {
         $utilisateur = new Utilisateur();
         $form = $this->createForm(UtilisateurType::class, $utilisateur, [
             'method' => 'POST',
@@ -204,13 +212,29 @@ class UtilisateurController extends BaseController
             $response = [];
             $redirect = $this->generateUrl('app_utilisateur_utilisateur_index');
 
+            // dd($form->getData()->getEmploye()->getAdresseMail());
+            $context = [
+                'username' => $form->getData()->getUsername(),
+                'password' => $form->getData()->getPassword(),
+                'mail' => $form->getData()->getEmploye()->getAdresseMail(),
+                'entreprise' => $form->getData()->getEmploye()->getEntreprise()->getDenomination(),
+                'fichier' => $configAppRepository->findOneBy(['entreprise' => $form->getData()->getEmploye()->getEntreprise()])->getLogo()
+            ];
 
-            //dd($form->getData()->getPassword());
+
 
             if ($form->isValid()) {
 
+
                 $utilisateur->setPassword($this->hasher->hashPassword($utilisateur, $form->getData()->getPassword()));
                 $utilisateurRepository->add($utilisateur, true);
+                $sendMailService->send(
+                    'konatenhamed@ufrseg.enig-sarl.com',
+                    $form->getData()->getEmploye()->getAdresseMail(),
+                    'infos compte',
+                    'contact',
+                    $context
+                );
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
@@ -248,9 +272,16 @@ class UtilisateurController extends BaseController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_utilisateur_utilisateur_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Utilisateur $utilisateur, EmployeRepository $employeRepository, UtilisateurRepository $utilisateurRepository, FormError $formError): Response
-    {
+    #[Route('/old/{id}/edit', name: 'app_utilisateur_utilisateur_edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Request $request,
+        Utilisateur $utilisateur,
+        ConfigAppRepository $configAppRepository,
+        SendMailService $sendMailService,
+        EmployeRepository $employeRepository,
+        UtilisateurRepository $utilisateurRepository,
+        FormError $formError
+    ): Response {
 
         $form = $this->createForm(UtilisateurEditType::class, $utilisateur, [
             'method' => 'POST',
@@ -271,11 +302,29 @@ class UtilisateurController extends BaseController
             $response = [];
             $redirect = $this->generateUrl('app_utilisateur_utilisateur_index');
 
+            $context = [
+                'username' => $form->getData()->getUsername(),
+                'password' => $form->getData()->getPassword(),
+                'mail' => $utilisateur->getEmploye()->getAdresseMail(),
+                'entreprise' => $utilisateur->getEmploye()->getEntreprise()->getDenomination(),
+                'fichier' => $configAppRepository->findOneBy(['entreprise' => $utilisateur->getEmploye()->getEntreprise()])->getLogo()
+            ];
+
+
+
+
             // dd($utilisateur->getEmploye()->getId());
             if ($form->isValid()) {
                 $utilisateur->setEmploye($employeRepository->find($utilisateur->getEmploye()->getId()));
                 $utilisateur->setPassword($this->hasher->hashPassword($utilisateur, $form->getData()->getPassword()));
                 $utilisateurRepository->add($utilisateur, true);
+                $sendMailService->send(
+                    'konatenhamed@ufrseg.enig-sarl.com',
+                    $utilisateur->getEmploye()->getAdresseMail(),
+                    'infos compte',
+                    'contact',
+                    $context
+                );
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
